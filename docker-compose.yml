@@ -1,0 +1,138 @@
+version: '3.8'
+
+services:
+  # Banco de dados PostgreSQL
+  postgres:
+    image: postgres:13-alpine
+    container_name: medsync-postgres
+    environment:
+      POSTGRES_DB: medsync
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    networks:
+      - medsync-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # RabbitMQ para comunicação assíncrona
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: medsync-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: password
+      RABBITMQ_DEFAULT_VHOST: /
+    ports:
+      - "5672:5672"   # Porta para clientes AMQP
+      - "15672:15672" # Porta para interface de gerenciamento
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - medsync-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Serviço de Agendamento
+  scheduling-service:
+    build:
+      context: ./scheduling-service
+      dockerfile: Dockerfile
+    container_name: medsync-scheduling
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_APPLICATION_NAME: scheduling-service
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/medsync
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: admin
+      SPRING_RABBITMQ_PASSWORD: password
+      APP_RABBITMQ_EXCHANGE: appointment-exchange
+      APP_RABBITMQ_QUEUE: scheduling-queue
+      APP_RABBITMQ_ROUTING_KEY: appointment-routing-key
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - medsync-network
+    restart: unless-stopped
+
+  # Serviço de Histórico (GraphQL)
+  history-service:
+    build:
+      context: ./history-service
+      dockerfile: Dockerfile
+    container_name: medsync-history
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_APPLICATION_NAME: history-service
+      SERVER_PORT: 8081
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/medsync
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      GRAPHQL_SERVLET_ENABLED: "true"
+      GRAPHQL_SERVLET_MAPPING: /graphql
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - medsync-network
+    restart: unless-stopped
+
+  # Serviço de Notificações
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: medsync-notification
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_APPLICATION_NAME: notification-service
+      SERVER_PORT: 8082
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: admin
+      SPRING_RABBITMQ_PASSWORD: password
+      APP_RABBITMQ_QUEUE: notification-queue
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - medsync-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+
+networks:
+  medsync-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
