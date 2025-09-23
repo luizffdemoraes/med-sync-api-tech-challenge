@@ -5,12 +5,12 @@
 
 * [Descrição do Projeto](#descrição-do-projeto)
 * [Funcionalidades e Endpoints](#funcionalidades-e-endpoints)
-
    * [📅 Scheduling Service](#-scheduling-service)
    * [📨 Notification Service](#-notification-service)
    * [📖 History Service (GraphQL)](#-history-service-graphql)
 * [Tecnologias Utilizadas](#tecnologias-utilizadas)
 * [Estrutura do Projeto](#estrutura-do-projeto)
+* [Clean Architecture](#clean-architecture)
 * [Diagrama de Arquitetura](#diagrama-de-arquitetura)
 * [Diagrama das tabelas de banco de dados](#diagrama-das-tabelas-de-banco-de-dados)
 * [Requisitos](#requisitos)
@@ -90,6 +90,158 @@ medsync-healthcare-system/
 ├── start.sh                # Script de inicialização
 ├── db/01-init.sql          # Script de criação do banco
 └── collection/             # Collections e environments do Postman
+```
+
+### 🧹 Clean Architecture
+Cada microsserviço segue os princípios da Clean Architecture, garantindo separação de concerns e testabilidade.
+
+
+#### scheduling-service
+```
+scheduling-service/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── br/com/fiap/postech/medsync/scheduling/
+│   │   │       │
+│   │   │       ├── application/
+│   │   │       │   ├── controllers/
+│   │   │       │   │   └── AppointmentController.java
+│   │   │       │   ├── dtos/
+│   │   │       │   │   ├── requests/
+│   │   │       │   │   │   ├── CreateAppointmentRequest.java
+│   │   │       │   │   │   └── UpdateAppointmentRequest.java
+│   │   │       │   │   └── responses/
+│   │   │       │   │       └── AppointmentResponse.java
+│   │   │       │   └── gateways/
+│   │   │       │       └── NotificationGateway.java
+│   │   │       │
+│   │   │       ├── domain/
+│   │   │       │   ├── entities/
+│   │   │       │   │   └── Appointment.java
+│   │   │       │   ├── gateways/
+│   │   │       │   │   └── AppointmentRepositoryGateway.java
+│   │   │       │   └── usecases/
+│   │   │       │       ├── CreateAppointmentUseCase.java
+│   │   │       │       ├── UpdateAppointmentUseCase.java
+│   │   │       │       └── CancelAppointmentUseCase.java
+│   │   │       │
+│   │   │       └── infrastructure/
+│   │   │           ├── config/
+│   │   │           │   ├── dependency/
+│   │   │           │   ├── security/
+│   │   │           │   └── RabbitMQConfig.java
+│   │   │           ├── exceptions/
+│   │   │           │   └── handler/
+│   │   │           ├── persistence/
+│   │   │           │   ├── entity/
+│   │   │           │   │   └── AppointmentJpaEntity.java
+│   │   │           │   └── repository/
+│   │   │           │       └── AppointmentRepository.java
+│   │   │           └── messaging/
+│   │   │               └── RabbitMQNotificationGateway.java
+│   │   │
+│   │   └── resources/
+│   │       ├── application.properties
+│   │       └── db/migration/
+│   │
+│   └── test/
+│       ├── java/... (estrutura espelhada)
+│       └── resources/
+├── Dockerfile
+└── pom.xml
+```
+
+#### notification-service
+```
+notification-service/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── br/com/fiap/postech/medsync/notification/
+│   │   │       │
+│   │   │       ├── application/
+│   │   │       │   ├── controllers/
+│   │   │       │   │   └── NotificationController.java
+│   │   │       │   ├── dtos/
+│   │   │       │   │   └── responses/
+│   │   │       │   │       └── NotificationResponse.java
+│   │   │       │   └── gateways/
+│   │   │       │       └── EmailGateway.java
+│   │   │       │
+│   │   │       ├── domain/
+│   │   │       │   ├── entities/
+│   │   │       │   │   └── Notification.java
+│   │   │       │   ├── gateways/
+│   │   │       │   │   ├── NotificationRepositoryGateway.java
+│   │   │       │   │   └── ExternalNotificationGateway.java
+│   │   │       │   └── usecases/
+│   │   │       │       └── SendNotificationUseCase.java
+│   │   │       │
+│   │   │       └── infrastructure/
+│   │   │           ├── config/
+│   │   │           │   └── RabbitMQConfig.java
+│   │   │           ├── persistence/
+│   │   │           │   ├── entity/
+│   │   │           │   │   └── NotificationJpaEntity.java
+│   │   │           │   └── repository/
+│   │   │           │       └── NotificationRepository.java
+│   │   │           └── messaging/
+│   │   │               └── AppointmentEventListener.java
+│   │   │
+│   │   └── resources/
+│   │       └── application.properties
+│   │
+│   └── test/... (estrutura espelhada)
+├── Dockerfile
+└── pom.xml
+```
+
+##### history-service (GraphQL)
+```
+history-service/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── br/com/fiap/postech/medsync/history/
+│   │   │       │
+│   │   │       ├── application/
+│   │   │       │   ├── controllers/
+│   │   │       │   │   └── MedicalRecordGraphQLController.java
+│   │   │       │   ├── dtos/
+│   │   │       │   │   └── responses/
+│   │   │       │   │       └── MedicalRecordResponse.java
+│   │   │       │   └── gateways/
+│   │   │       │       └── SchedulingGateway.java
+│   │   │       │
+│   │   │       ├── domain/
+│   │   │       │   ├── entities/
+│   │   │       │   │   └── MedicalRecord.java
+│   │   │       │   ├── gateways/
+│   │   │       │   │   └── MedicalRecordRepositoryGateway.java
+│   │   │       │   └── usecases/
+│   │   │       │       ├── GetPatientHistoryUseCase.java
+│   │   │       │       └── GetMedicalRecordUseCase.java
+│   │   │       │
+│   │   │       └── infrastructure/
+│   │   │           ├── config/
+│   │   │           │   └── GraphQLConfig.java
+│   │   │           ├── persistence/
+│   │   │           │   ├── entity/
+│   │   │           │   │   └── MedicalRecordJpaEntity.java
+│   │   │           │   └── repository/
+│   │   │           │       └── MedicalRecordRepository.java
+│   │   │           └── resolvers/
+│   │   │               └── MedicalRecordResolver.java
+│   │   │
+│   │   └── resources/
+│   │       ├── application.properties
+│   │       └── graphql/
+│   │           └── medicalRecord.graphqls
+│   │
+│   └── test/... (estrutura espelhada)
+├── Dockerfile
+└── pom.xml
 ```
 
 ---
