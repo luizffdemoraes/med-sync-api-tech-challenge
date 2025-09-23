@@ -178,11 +178,13 @@ notification-service/
 │   │   │           ├── persistence/
 │   │   │           │   ├── entity/
 │   │   │           │   │   └── NotificationJpaEntity.java
-│   │   │           │   └── repository/
-│   │   │           │       └── NotificationRepository.java
+│   │   │           │   ├── repository/
+│   │   │           │   │   └── NotificationRepository.java
+│   │   │           │   └── NotificationRepositoryGatewayImpl.java
 │   │   │           └── messaging/
 │   │   │               ├── AppointmentEventListener.java
-│   │   │               └── ConsoleNotificationGateway.java
+│   │   │               ├── ConsoleNotificationGateway.java
+│   │   │               └── EmailNotificationGateway.java
 │   │   │
 │   │   └── resources/
 │   │       └── application.properties
