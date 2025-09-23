@@ -161,20 +161,14 @@ notification-service/
 │   │   │   └── br/com/fiap/postech/medsync/notification/
 │   │   │       │
 │   │   │       ├── application/
-│   │   │       │   ├── controllers/
-│   │   │       │   │   └── NotificationController.java
-│   │   │       │   ├── dtos/
-│   │   │       │   │   └── responses/
-│   │   │       │   │       └── NotificationResponse.java
 │   │   │       │   └── gateways/
-│   │   │       │       └── EmailGateway.java
+│   │   │       │       └── ExternalNotificationGateway.java
 │   │   │       │
 │   │   │       ├── domain/
 │   │   │       │   ├── entities/
 │   │   │       │   │   └── Notification.java
 │   │   │       │   ├── gateways/
-│   │   │       │   │   ├── NotificationRepositoryGateway.java
-│   │   │       │   │   └── ExternalNotificationGateway.java
+│   │   │       │   │   └── NotificationRepositoryGateway.java
 │   │   │       │   └── usecases/
 │   │   │       │       └── SendNotificationUseCase.java
 │   │   │       │
@@ -187,13 +181,13 @@ notification-service/
 │   │   │           │   └── repository/
 │   │   │           │       └── NotificationRepository.java
 │   │   │           └── messaging/
-│   │   │               └── AppointmentEventListener.java
+│   │   │               ├── AppointmentEventListener.java
+│   │   │               └── ConsoleNotificationGateway.java
 │   │   │
 │   │   └── resources/
 │   │       └── application.properties
 │   │
-│   └── test/... (estrutura espelhada)
-├── Dockerfile
+│   └── test/
 └── pom.xml
 ```
 
