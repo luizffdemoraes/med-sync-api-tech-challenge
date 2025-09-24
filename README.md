@@ -174,7 +174,7 @@ notification-service/
 │   │   │       │   │   └── NotificationStatus.java
 │   │   │       │   └── gateways/
 │   │   │       │       ├── NotificationGateway.java			 # Interfaces
-│   │   │       │       └──EmailNotificationGateway.java		 # Interfaces
+│   │   │       │       └── EmailNotificationGateway.java		 # Interfaces
 │   │   │       │
 │   │   │       └── infrastructure/
 │   │   │           ├── config/
