@@ -1,5 +1,12 @@
 package br.com.fiap.postech.medsync.notification.infrastructure.messaging;
 
+import br.com.fiap.postech.medsync.notification.application.usecases.CreateNotificationUseCase;
+import br.com.fiap.postech.medsync.notification.application.usecases.SendNotificationUseCase;
+import br.com.fiap.postech.medsync.notification.application.usecases.UpdateNotificationStatusUseCase;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 @Component
 public class NotificationMessageConsumer {
 

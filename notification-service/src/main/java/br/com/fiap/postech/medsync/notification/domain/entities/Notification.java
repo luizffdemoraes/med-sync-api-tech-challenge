@@ -8,7 +8,7 @@ public class Notification {
     private String patientEmail;
     private LocalDateTime appointmentDate;
     private String eventType;
-    private String status;
+    private NotificationStatus status;
     private String message;
     private LocalDateTime sentAt;
     private LocalDateTime createdAt;
@@ -21,19 +21,19 @@ public class Notification {
         notification.patientEmail = patientEmail;
         notification.appointmentDate = appointmentDate;
         notification.eventType = eventType;
-        notification.status = "PENDING";
+        notification.status = NotificationStatus.PENDING;
         notification.message = message;
         notification.createdAt = LocalDateTime.now();
         return notification;
     }
 
     public void markAsSent() {
-        this.status = "SENT";
+        this.status = NotificationStatus.SENT;
         this.sentAt = LocalDateTime.now();
     }
 
     public void markAsFailed() {
-        this.status = "FAILED";
+        this.status = NotificationStatus.FAILED;
         this.sentAt = LocalDateTime.now();
     }
 
@@ -43,7 +43,7 @@ public class Notification {
     public String getPatientEmail() { return patientEmail; }
     public LocalDateTime getAppointmentDate() { return appointmentDate; }
     public String getEventType() { return eventType; }
-    public String getStatus() { return status; }
+    public NotificationStatus getStatus() { return status; }
     public String getMessage() { return message; }
     public LocalDateTime getSentAt() { return sentAt; }
     public LocalDateTime getCreatedAt() { return createdAt; }
