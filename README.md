@@ -159,32 +159,40 @@ notification-service/
 │   ├── main/
 │   │   ├── java/
 │   │   │   └── br/com/fiap/postech/medsync/notification/
-│   │   │       │
 │   │   │       ├── application/
-│   │   │       │   └── gateways/
-│   │   │       │       └── ExternalNotificationGateway.java
+│   │   │       │   └── usecases/
+│   │   │       │       ├── CreateNotificationUseCase.java    	 # Interfaces
+│   │   │       │       ├── CreateNotificationUseCaseImp.java
+│   │   │       │       ├── SendNotificationUseCase.java      	 # Interfaces
+│   │   │       │       ├── SendNotificationUseCaseImp.java
+│   │   │       │       ├── UpdateNotificationStatusUseCase.java # Interfaces
+│   │   │       │       └── UpdateNotificationStatusUseCaseImp.java
 │   │   │       │
 │   │   │       ├── domain/
-│   │   │       │   ├── entities/
-│   │   │       │   │   └── Notification.java
-│   │   │       │   ├── gateways/
-│   │   │       │   │   └── NotificationRepositoryGateway.java
-│   │   │       │   └── usecases/
-│   │   │       │       └── SendNotificationUseCase.java
+│   │   │       │   └── entities/
+│   │   │       │   │   ├── Notification.java
+│   │   │       │   │   └── NotificationStatus.java
+│   │   │       │   └── gateways/
+│   │   │       │       ├── NotificationGateway.java			 # Interfaces
+│   │   │       │       └──EmailNotificationGateway.java		 # Interfaces
 │   │   │       │
 │   │   │       └── infrastructure/
 │   │   │           ├── config/
-│   │   │           │   └── RabbitMQConfig.java
+│   │   │           │   ├── RabbitMQConfig.java
+│   │   │           │   └── EmailConfig.java
+│   │   │           ├── exceptions/
+│   │   │           │   └── handler/
+│   │   │           │ 		└── GlobalExceptionHandler.java
 │   │   │           ├── persistence/
 │   │   │           │   ├── entity/
-│   │   │           │   │   └── NotificationJpaEntity.java
-│   │   │           │   ├── repository/
-│   │   │           │   │   └── NotificationRepository.java
-│   │   │           │   └── NotificationRepositoryGatewayImpl.java
+│   │   │           │   │   └── NotificationEntity.java
+│   │   │           │   └── repository/
+│   │   │           │       └── NotificationRepository.java
+│   │   │           ├── gateways/
+│   │   │           │   ├── NotificationGatewayImp.java        
+│   │   │           │   └── EmailNotificationGatewayImpl.java
 │   │   │           └── messaging/
-│   │   │               ├── AppointmentEventListener.java
-│   │   │               ├── ConsoleNotificationGateway.java
-│   │   │               └── EmailNotificationGateway.java
+│   │   │               └── NotificationMessageConsumer.java 
 │   │   │
 │   │   └── resources/
 │   │       └── application.properties
