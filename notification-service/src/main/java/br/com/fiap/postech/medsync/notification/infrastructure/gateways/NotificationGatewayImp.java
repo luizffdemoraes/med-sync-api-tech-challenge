@@ -5,7 +5,6 @@ import br.com.fiap.postech.medsync.notification.domain.entities.NotificationStat
 import br.com.fiap.postech.medsync.notification.domain.gateways.NotificationGateway;
 import br.com.fiap.postech.medsync.notification.infrastructure.persistence.entity.NotificationEntity;
 import br.com.fiap.postech.medsync.notification.infrastructure.persistence.repository.NotificationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -15,7 +14,6 @@ public class NotificationGatewayImp implements NotificationGateway {
 
     private final NotificationRepository repository;
 
-    @Autowired
     public NotificationGatewayImp(NotificationRepository notificationRepository) {
         this.repository = notificationRepository;
     }
