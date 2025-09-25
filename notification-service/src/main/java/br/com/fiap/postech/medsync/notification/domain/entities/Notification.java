@@ -47,4 +47,21 @@ public class Notification {
     public String getMessage() { return message; }
     public LocalDateTime getSentAt() { return sentAt; }
     public LocalDateTime getCreatedAt() { return createdAt; }
+
+    public static Notification of(Long id, Long patientId, String patientEmail,
+                                  LocalDateTime appointmentDate, String eventType,
+                                  NotificationStatus status, String message,
+                                  LocalDateTime sentAt, LocalDateTime createdAt) {
+        Notification notification = new Notification();
+        notification.id = id;
+        notification.patientId = patientId;
+        notification.patientEmail = patientEmail;
+        notification.appointmentDate = appointmentDate;
+        notification.eventType = eventType;
+        notification.status = status;
+        notification.message = message;
+        notification.sentAt = sentAt;
+        notification.createdAt = createdAt;
+        return notification;
+    }
 }
