@@ -5,20 +5,22 @@ import br.com.fiap.postech.medsync.notification.application.usecases.SendNotific
 import br.com.fiap.postech.medsync.notification.application.usecases.UpdateNotificationStatusUseCase;
 import br.com.fiap.postech.medsync.notification.domain.entities.NotificationStatus;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class NotificationMessageConsumer {
 
-    @Autowired
-    private CreateNotificationUseCase createNotificationUseCase;
+    private final CreateNotificationUseCase createNotificationUseCase;
+    private final SendNotificationUseCase sendNotificationUseCase;
+    private final UpdateNotificationStatusUseCase updateNotificationStatusUseCase;
 
-    @Autowired
-    private SendNotificationUseCase sendNotificationUseCase;
-
-    @Autowired
-    private UpdateNotificationStatusUseCase updateNotificationStatusUseCase;
+    public NotificationMessageConsumer(CreateNotificationUseCase createNotificationUseCase,
+                                       SendNotificationUseCase sendNotificationUseCase,
+                                       UpdateNotificationStatusUseCase updateNotificationStatusUseCase) {
+        this.createNotificationUseCase = createNotificationUseCase;
+        this.sendNotificationUseCase = sendNotificationUseCase;
+        this.updateNotificationStatusUseCase = updateNotificationStatusUseCase;
+    }
 
     @RabbitListener(queues = "${app.rabbitmq.queue}")
     public void receiveMessage(NotificationMessageDTO dto) {

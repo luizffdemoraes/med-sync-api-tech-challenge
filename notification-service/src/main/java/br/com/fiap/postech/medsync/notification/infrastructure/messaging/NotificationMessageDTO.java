@@ -1,5 +1,7 @@
 package br.com.fiap.postech.medsync.notification.infrastructure.messaging;
 
+import br.com.fiap.postech.medsync.notification.domain.entities.Notification;
+
 import java.time.LocalDateTime;
 
 public class NotificationMessageDTO {
