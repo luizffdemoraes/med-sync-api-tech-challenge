@@ -21,7 +21,6 @@ public class EmailNotificationGatewayImpl implements EmailNotificationGateway {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailNotificationGatewayImpl.class);
 
-    // Injete o token do Mailtrap a partir das configurações (application.properties)
     @Value("${mailtrap.api-token}")
     private String mailtrapApiToken;
 

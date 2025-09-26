@@ -11,10 +11,6 @@ public class NotificationMessageDTO {
     private String eventType;
     private String message;
 
-    // Construtores
-    public NotificationMessageDTO() {
-    }
-
     public NotificationMessageDTO(Long patientId, String patientEmail, LocalDateTime appointmentDate, String eventType, String message) {
         this.patientId = patientId;
         this.patientEmail = patientEmail;

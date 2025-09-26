@@ -12,7 +12,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotificationSendException.class)
     public ResponseEntity<String> handleNotificationSendException(NotificationSendException ex) {
-        // Aqui retorna o erro como string, você pode customizar para um objeto se desejar.
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Erro ao enviar notificação: " + ex.getMessage());
