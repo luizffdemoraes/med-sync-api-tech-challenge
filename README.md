@@ -73,6 +73,7 @@ O sistema contempla perfis distintos (**DOCTOR, NURSE, PATIENT**) com permissõe
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge\&logo=spring-boot\&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge\&logo=docker\&logoColor=white)
 ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge\&logo=rabbitmq\&logoColor=white)
+![Mailtrap](https://img.shields.io/badge/Mailtrap-00B3E6?style=for-the-badge\&logo=mailtrap&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge\&logo=postgresql\&logoColor=white)
 ![GraphQL](https://img.shields.io/badge/GraphQL-E10098?style=for-the-badge\&logo=graphql\&logoColor=white)
 ![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge\&logo=postman\&logoColor=white)
@@ -320,6 +321,12 @@ O relatório estará disponível em:
 ```
 target/site/jacoco/index.html
 ```
+
+### Exemplo da cobertura gerada:
+
+### notification-service
+
+![notification-coverage](images/notification-coverage.png)
 
 ---
 
