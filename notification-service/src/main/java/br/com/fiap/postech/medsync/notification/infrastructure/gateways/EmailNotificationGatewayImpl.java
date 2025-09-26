@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
@@ -40,8 +41,11 @@ public class EmailNotificationGatewayImpl implements EmailNotificationGateway {
                     .from(new Address("hello@demomailtrap.co", "MedSync Notificações"))
                     .to(List.of(new Address(notification.getPatientEmail())))
                     .subject("Notificação de consulta")
-                    .text(notification.getMessage())
                     .category("Notificações")
+                    .text(String.format(
+                            notification.getMessage(),
+                            notification.getAppointmentDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm"))
+                    ))
                     .build();
 
             client.send(mail);
