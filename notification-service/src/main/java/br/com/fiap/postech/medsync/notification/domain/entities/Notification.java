@@ -27,16 +27,6 @@ public class Notification {
         return notification;
     }
 
-    public void markAsSent() {
-        this.status = NotificationStatus.SENT;
-        this.sentAt = LocalDateTime.now();
-    }
-
-    public void markAsFailed() {
-        this.status = NotificationStatus.FAILED;
-        this.sentAt = LocalDateTime.now();
-    }
-
     // Apenas getters
     public Long getId() { return id; }
     public Long getPatientId() { return patientId; }
