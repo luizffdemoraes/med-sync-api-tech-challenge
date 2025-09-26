@@ -8,6 +8,8 @@ import io.mailtrap.config.MailtrapConfig;
 import io.mailtrap.factory.MailtrapClientFactory;
 import io.mailtrap.model.request.emails.Address;
 import io.mailtrap.model.request.emails.MailtrapMail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +17,8 @@ import java.util.List;
 
 @Component
 public class EmailNotificationGatewayImpl implements EmailNotificationGateway {
+
+    private static final Logger logger = LoggerFactory.getLogger(EmailNotificationGatewayImpl.class);
 
     // Injete o token do Mailtrap a partir das configurações (application.properties)
     @Value("${mailtrap.api-token}")
@@ -42,6 +46,7 @@ public class EmailNotificationGatewayImpl implements EmailNotificationGateway {
 
             client.send(mail);
         } catch (Exception e) {
+            logger.error("Erro ao enviar notificação para {}: {}", notification.getPatientEmail(), e.getMessage(), e);
             throw new NotificationSendException("Falha ao enviar notificação: " + e.getMessage());
         }
     }
