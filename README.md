@@ -232,70 +232,72 @@ history-service/
 │   │   │       │
 │   │   │       ├── application/
 │   │   │       │   ├── usecases/
-│   │   │       │   │   │   ProcessAppointmentEventUseCase.java
-│   │   │       │   │   │   ProcessAppointmentEventUseCaseImp.java
-│   │   │       │   │   │   GetPatientHistoryUseCase.java
-│   │   │       │   │   │   GetPatientHistoryUseCaseImp.java
-│   │   │       │   │   │   GetAppointmentsByStatusUseCase.java
-│   │   │       │   │   │   GetAppointmentsByStatusUseCaseImp.java
-│   │   │       │   │   │   UpdateMedicalRecordUseCase.java
-│   │   │       │   │   │   UpdateMedicalRecordUseCaseImp.java
-│   │   │       │   │   │   CreateMedicalRecordUseCase.java
-│   │   │       │   │   │   CreateMedicalRecordUseCaseImp.java
-│   │   │       │   │   │
+│   │   │       │   │   ├── GetPatientHistoryUseCase.java
+│   │   │       │   │   ├── GetPatientHistoryUseCaseImp.java
+│   │   │       │   │   ├── GetAppointmentsByStatusUseCase.java
+│   │   │       │   │   ├── GetAppointmentsByStatusUseCaseImp.java
+│   │   │       │   │   ├── CreateMedicalRecordUseCase.java
+│   │   │       │   │   ├── CreateMedicalRecordUseCaseImp.java
+│   │   │       │   │   ├── AddMedicalDataUseCase.java
+│   │   │       │   │   ├── AddMedicalDataUseCaseImp.java
+│   │   │       │   │   ├── UpdateAppointmentStatusUseCase.java
+│   │   │       │   │   └── UpdateAppointmentStatusUseCaseImp.java
+│   │   │       │   │
 │   │   │       │   └── dtos/
-│   │   │       │       │   AppointmentEventDTO.java
-│   │   │       │       │   MedicalDataDTO.java
-│   │   │       │       │   MedicalRecordResponseDTO.java
-│   │   │       │       │   GraphQLQueryRequest.java
+│   │   │       │       ├── requests/
+│   │   │       │       │   └── GraphQLQueryRequest.java
 │   │   │       │       │
-│   │   │       │       └── responses/
-│   │   │       │               MedicalRecordResponse.java
+│   │   │       │       ├── responses/
+│   │   │       │       │   └── MedicalRecordResponse.java
+│   │   │       │       │
+│   │   │       │       └── messaging/
+│   │   │       │           ├── AppointmentCreatedEvent.java
+│   │   │       │           ├── MedicalDataAddedEvent.java
+│   │   │       │           ├── AppointmentCompletedEvent.java
+│   │   │       │           └── AppointmentCancelledEvent.java
 │   │   │       │
 │   │   │       ├── domain/
 │   │   │       │   ├── entities/
-│   │   │       │   │       MedicalRecord.java
-│   │   │       │   │       AppointmentStatus.java
-│   │   │       │   │       EventType.java
+│   │   │       │   │   ├── MedicalRecord.java
+│   │   │       │   │   ├── AppointmentStatus.java
+│   │   │       │   │   └── EventType.java
 │   │   │       │   │
 │   │   │       │   └── gateways/
-│   │   │       │           MedicalRecordRepositoryGateway.java
-│   │   │       │           AppointmentEventGateway.java
+│   │   │       │       └── MedicalRecordRepositoryGateway.java
 │   │   │       │
 │   │   │       └── infrastructure/
 │   │   │           ├── config/
-│   │   │           │       RabbitMQConfig.java
-│   │   │           │       GraphQLConfig.java
-│   │   │           │       SecurityConfig.java
-│   │   │           │       DependencyInjectionConfig.java
+│   │   │           │   ├── RabbitMQConfig.java
+│   │   │           │   ├── GraphQLConfig.java
+│   │   │           │   ├── SecurityConfig.java
+│   │   │           │   └── DependencyInjectionConfig.java
 │   │   │           │
 │   │   │           ├── exceptions/
-│   │   │           │   │   MedicalRecordNotFoundException.java
-│   │   │           │   │   InvalidAppointmentEventException.java
-│   │   │           │   │   PatientAccessDeniedException.java
+│   │   │           │   ├── MedicalRecordNotFoundException.java
+│   │   │           │   ├── InvalidAppointmentEventException.java
+│   │   │           │   ├── PatientAccessDeniedException.java
 │   │   │           │   │
 │   │   │           │   └── handler/
-│   │   │           │           GlobalExceptionHandler.java
-│   │   │           │           GraphQLExceptionHandler.java
+│   │   │           │       ├── GlobalExceptionHandler.java
+│   │   │           │       └── GraphQLExceptionHandler.java
 │   │   │           │
 │   │   │           ├── gateways/
-│   │   │           │       MedicalRecordRepositoryGatewayImpl.java
-│   │   │           │       AppointmentEventGatewayImpl.java
+│   │   │           │   └── MedicalRecordRepositoryGatewayImpl.java
 │   │   │           │
 │   │   │           ├── messaging/
-│   │   │           │       AppointmentMessageConsumer.java
-│   │   │           │       AppointmentMessageDTO.java
+│   │   │           │   ├── AppointmentMessageConsumer.java
+│   │   │           │   └── AppointmentMessageDTO.java
 │   │   │           │
 │   │   │           ├── persistence/
 │   │   │           │   ├── entity/
-│   │   │           │   │       MedicalRecordJpaEntity.java
+│   │   │           │   │   └── MedicalRecordJpaEntity.java
 │   │   │           │   │
 │   │   │           │   └── repository/
-│   │   │           │           MedicalRecordRepository.java
+│   │   │           │       └── MedicalRecordRepository.java
 │   │   │           │
 │   │   │           └── resolvers/
-│   │   │                   MedicalRecordResolver.java
-│   │   │                   MedicalRecordQueryResolver.java
+│   │   │               ├── MedicalRecordResolver.java
+│   │   │               └── MedicalRecordQueryResolver.java
 │   │   │
 │   │   └── resources/
 │   │       ├── application.properties
