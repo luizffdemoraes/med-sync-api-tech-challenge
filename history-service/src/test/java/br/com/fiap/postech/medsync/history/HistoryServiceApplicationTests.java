@@ -1,4 +1,4 @@
-package br.com.fiap.postech.medsync.history_service;
+package br.com.fiap.postech.medsync.history;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

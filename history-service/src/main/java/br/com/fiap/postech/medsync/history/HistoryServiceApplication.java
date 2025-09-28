@@ -1,4 +1,4 @@
-package br.com.fiap.postech.medsync.history_service;
+package br.com.fiap.postech.medsync.history;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

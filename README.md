@@ -39,12 +39,12 @@ O sistema contempla perfis distintos (**DOCTOR, NURSE, PATIENT**) com permissõe
 
 ### 📅 Scheduling Service
 
-| Operação                 | Descrição                           | Acesso               |
-| ------------------------ | ----------------------------------- | -------------------- |
-| `POST /appointments`     | Criar nova consulta                 | DOCTOR/NURSE         |
-| `PUT /appointments/{id}` | Editar uma consulta existente       | DOCTOR/NURSE         |
-| `GET /appointments/{id}` | Visualizar detalhes de uma consulta | DOCTOR/NURSE/PATIENT |
-| `GET /appointments`      | Listar consultas (com filtros)      | DOCTOR/NURSE/PATIENT |
+| Operação                 | Descrição                           | Acesso       |
+| ------------------------ | ----------------------------------- |--------------|
+| `POST /appointments`     | Criar nova consulta                 | DOCTOR/NURSE |
+| `PUT /appointments/{id}` | Editar uma consulta existente       | DOCTOR/NURSE |
+| `GET /appointments/{id}` | Visualizar detalhes de uma consulta | DOCTOR/NURSE |
+| `GET /appointments`      | Listar consultas (com filtros)      | DOCTOR/NURSE |
 
 ---
 
@@ -53,16 +53,34 @@ O sistema contempla perfis distintos (**DOCTOR, NURSE, PATIENT**) com permissõe
 | Operação                    | Descrição                                    | Acesso  |
 | --------------------------- | -------------------------------------------- | ------- |
 | Recebe eventos via RabbitMQ | Processa mensagens de agendamento/editadas   | Interno |
-| `GET /notifications/{id}`   | Consulta notificações enviadas a um paciente | DOCTOR  |
 
 ---
 
 ### 📖 History Service (GraphQL)
 
-| Operação (GraphQL)          | Descrição                               | Acesso               |
-| --------------------------- | --------------------------------------- | -------------------- |
-| `patientHistory(patientId)` | Retorna histórico completo do paciente  | DOCTOR/NURSE/PATIENT |
-| `appointments(patientId)`   | Retorna consultas agendadas ou passadas | DOCTOR/NURSE/PATIENT |
+| Operação (GraphQL)          | Descrição                               | Acesso  |
+| --------------------------- | --------------------------------------- | ------- |
+| `patientHistory(patientId)` | Retorna histórico completo do paciente  | PATIENT |
+| `appointments(patientId)`   | Retorna consultas agendadas ou passadas | PATIENT |
+
+# 🔄 Fluxo de Mensagens RabbitMQ
+
+| Evento | Routing Key | Queue Destino | Ação no History Service |
+|--------|-------------|---------------|------------------------|
+| **APPOINTMENT_CREATED** | `appointment.created` | `history.service.queue` | Cria registro básico da consulta |
+| **APPOINTMENT_COMPLETED** | `appointment.completed` | `history.service.queue` | Atualiza status para "COMPLETED" |
+| **MEDICAL_DATA_ADDED** | `appointment.medical.updated` | `history.service.queue` | Adiciona diagnósticos e prescrições |
+| **APPOINTMENT_CANCELLED** | `appointment.cancelled` | `history.service.queue` | Atualiza status para "CANCELLED" |
+| **APPOINTMENT_UPDATED** | `appointment.updated` | `history.service.queue` | Atualiza data/hora da consulta |
+
+# 🛡️ Regras de Segurança
+
+| Validação | Descrição | Implementação |
+|-----------|-----------|---------------|
+| **Autenticação JWT** | Token válido obrigatório em todas as requisições | Spring Security OAuth2 |
+| **Validação de Role** | Apenas usuários com role `PATIENT` podem acessar | `@PreAuthorize("hasRole('PATIENT')")` |
+| **Propriedade dos Dados** | Paciente só pode acessar seu próprio histórico | Validação de `patientId` vs ID do token |
+| **Idempotência** | Mensagens duplicadas não criam registros duplicados | Verificação de `appointment_id` existente |
 
 ---
 
@@ -210,41 +228,86 @@ history-service/
 │   │   ├── java/
 │   │   │   └── br/com/fiap/postech/medsync/history/
 │   │   │       │
+│   │   │       ├── HistoryServiceApplication.java
+│   │   │       │
 │   │   │       ├── application/
-│   │   │       │   ├── controllers/
-│   │   │       │   │   └── MedicalRecordGraphQLController.java
-│   │   │       │   ├── dtos/
-│   │   │       │   │   └── responses/
-│   │   │       │   │       └── MedicalRecordResponse.java
-│   │   │       │   └── gateways/
-│   │   │       │       └── SchedulingGateway.java
+│   │   │       │   ├── usecases/
+│   │   │       │   │   │   ProcessAppointmentEventUseCase.java
+│   │   │       │   │   │   ProcessAppointmentEventUseCaseImp.java
+│   │   │       │   │   │   GetPatientHistoryUseCase.java
+│   │   │       │   │   │   GetPatientHistoryUseCaseImp.java
+│   │   │       │   │   │   GetAppointmentsByStatusUseCase.java
+│   │   │       │   │   │   GetAppointmentsByStatusUseCaseImp.java
+│   │   │       │   │   │   UpdateMedicalRecordUseCase.java
+│   │   │       │   │   │   UpdateMedicalRecordUseCaseImp.java
+│   │   │       │   │   │   CreateMedicalRecordUseCase.java
+│   │   │       │   │   │   CreateMedicalRecordUseCaseImp.java
+│   │   │       │   │   │
+│   │   │       │   └── dtos/
+│   │   │       │       │   AppointmentEventDTO.java
+│   │   │       │       │   MedicalDataDTO.java
+│   │   │       │       │   MedicalRecordResponseDTO.java
+│   │   │       │       │   GraphQLQueryRequest.java
+│   │   │       │       │
+│   │   │       │       └── responses/
+│   │   │       │               MedicalRecordResponse.java
 │   │   │       │
 │   │   │       ├── domain/
 │   │   │       │   ├── entities/
-│   │   │       │   │   └── MedicalRecord.java
-│   │   │       │   ├── gateways/
-│   │   │       │   │   └── MedicalRecordRepositoryGateway.java
-│   │   │       │   └── usecases/
-│   │   │       │       ├── GetPatientHistoryUseCase.java
-│   │   │       │       └── GetMedicalRecordUseCase.java
+│   │   │       │   │       MedicalRecord.java
+│   │   │       │   │       AppointmentStatus.java
+│   │   │       │   │       EventType.java
+│   │   │       │   │
+│   │   │       │   └── gateways/
+│   │   │       │           MedicalRecordRepositoryGateway.java
+│   │   │       │           AppointmentEventGateway.java
 │   │   │       │
 │   │   │       └── infrastructure/
 │   │   │           ├── config/
-│   │   │           │   └── GraphQLConfig.java
+│   │   │           │       RabbitMQConfig.java
+│   │   │           │       GraphQLConfig.java
+│   │   │           │       SecurityConfig.java
+│   │   │           │       DependencyInjectionConfig.java
+│   │   │           │
+│   │   │           ├── exceptions/
+│   │   │           │   │   MedicalRecordNotFoundException.java
+│   │   │           │   │   InvalidAppointmentEventException.java
+│   │   │           │   │   PatientAccessDeniedException.java
+│   │   │           │   │
+│   │   │           │   └── handler/
+│   │   │           │           GlobalExceptionHandler.java
+│   │   │           │           GraphQLExceptionHandler.java
+│   │   │           │
+│   │   │           ├── gateways/
+│   │   │           │       MedicalRecordRepositoryGatewayImpl.java
+│   │   │           │       AppointmentEventGatewayImpl.java
+│   │   │           │
+│   │   │           ├── messaging/
+│   │   │           │       AppointmentMessageConsumer.java
+│   │   │           │       AppointmentMessageDTO.java
+│   │   │           │
 │   │   │           ├── persistence/
 │   │   │           │   ├── entity/
-│   │   │           │   │   └── MedicalRecordJpaEntity.java
+│   │   │           │   │       MedicalRecordJpaEntity.java
+│   │   │           │   │
 │   │   │           │   └── repository/
-│   │   │           │       └── MedicalRecordRepository.java
+│   │   │           │           MedicalRecordRepository.java
+│   │   │           │
 │   │   │           └── resolvers/
-│   │   │               └── MedicalRecordResolver.java
+│   │   │                   MedicalRecordResolver.java
+│   │   │                   MedicalRecordQueryResolver.java
 │   │   │
 │   │   └── resources/
 │   │       ├── application.properties
 │   │       └── graphql/
 │   │           └── medicalRecord.graphqls
 │   │
-│   └── test/... (estrutura espelhada)
+│   └── test/
+│       └── java/
+│           └── br/com/fiap/postech/medsync/history/
+│               ├── application/
+│               ├── domain/
+│               └── infrastructure/
 ├── Dockerfile
 └── pom.xml
 ```
