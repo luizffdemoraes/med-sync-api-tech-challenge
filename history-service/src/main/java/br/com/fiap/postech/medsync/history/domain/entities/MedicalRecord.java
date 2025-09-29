@@ -3,6 +3,7 @@ package br.com.fiap.postech.medsync.history.domain.entities;
 import java.time.LocalDateTime;
 
 public class MedicalRecord {
+    private Long id;
     private Long appointmentId;
     private Long patientUserId;
     private Long doctorUserId;
@@ -18,6 +19,7 @@ public class MedicalRecord {
     private LocalDateTime updatedAt;
 
     public MedicalRecord(
+            Long id,
             Long appointmentId,
             Long patientUserId,
             Long doctorUserId,
@@ -26,6 +28,7 @@ public class MedicalRecord {
             String type,
             String notes
     ) {
+        this.id = id;
         this.appointmentId = appointmentId;
         this.patientUserId = patientUserId;
         this.doctorUserId = doctorUserId;
@@ -38,6 +41,18 @@ public class MedicalRecord {
     }
 
     public MedicalRecord() {
+    }
+
+    public MedicalRecord(Long id, Long patientUserId, Long doctorUserId, LocalDateTime appointmentDate, AppointmentStatus appointmentStatus, String type, String notes) {
+        this.id = id;
+        this.patientUserId = patientUserId;
+        this.doctorUserId = doctorUserId;
+        this.appointmentDate = appointmentDate;
+        this.status = appointmentStatus;
+        this.type = type;
+        this.notes = notes;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     public Long getAppointmentId() {
@@ -72,8 +87,8 @@ public class MedicalRecord {
         this.appointmentDate = appointmentDate;
     }
 
-    public AppointmentStatus getStatus() {
-        return status;
+    public String getStatus() {
+        return status.toString();
     }
 
     public void setStatus(AppointmentStatus status) {
@@ -142,5 +157,13 @@ public class MedicalRecord {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

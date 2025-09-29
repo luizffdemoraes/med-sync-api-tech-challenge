@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
-public class UpdateAppointmentStatusUseCaseImp implements UpdateAppointmentStatusUseCase{
+public class UpdateAppointmentStatusUseCaseImp implements UpdateAppointmentStatusUseCase {
 
     private static final Logger logger = LoggerFactory.getLogger(UpdateAppointmentStatusUseCaseImp.class);
     private final MedicalRecordRepositoryGateway gateway;
@@ -33,12 +33,19 @@ public class UpdateAppointmentStatusUseCaseImp implements UpdateAppointmentStatu
         Optional<MedicalRecord> medicalRecordOpt = gateway.findByAppointmentId(appointmentId);
 
         if (medicalRecordOpt.isEmpty()) {
-            logger.error("Medical record not found for appointment {}", appointmentId);
+            logger.warn("Medical record not found for appointment {}. Cannot update status to {}",
+                    appointmentId, status);
+            return;
         }
 
-        MedicalRecord medicalRecord = medicalRecordOpt.get();
-        medicalRecord.setStatus(status);
+        try {
+            MedicalRecord medicalRecord = medicalRecordOpt.get();
+            medicalRecord.setStatus(status);
 
-        gateway.update(medicalRecord);
+            gateway.update(medicalRecord);
+        } catch (Exception e) {
+            logger.error("Error updating status for appointment {}: {}",
+                    appointmentId, e.getMessage(), e);
+        }
     }
 }

@@ -7,7 +7,7 @@ import br.com.fiap.postech.medsync.history.domain.gateways.MedicalRecordReposito
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CreateMedicalRecordUseCaseImp implements CreateMedicalRecordUseCase{
+public class CreateMedicalRecordUseCaseImp implements CreateMedicalRecordUseCase {
 
     private static final Logger logger = LoggerFactory.getLogger(CreateMedicalRecordUseCaseImp.class);
     private final MedicalRecordRepositoryGateway gateway;
@@ -24,17 +24,23 @@ public class CreateMedicalRecordUseCaseImp implements CreateMedicalRecordUseCase
             logger.warn("Medical record already exists for appointment {}", appointment.getId());
         }
 
-        MedicalRecord medicalRecord = new MedicalRecord(
-                appointment.getId(),
-                appointment.getPatientUserId(),
-                appointment.getDoctorUserId(),
-                appointment.getAppointmentDate(),
-                AppointmentStatus.valueOf(appointment.getStatus()),
-                appointment.getType(),
-                appointment.getNotes()
-        );
+        try {
+            MedicalRecord medicalRecord = new MedicalRecord(
+                    appointment.getId(),
+                    appointment.getPatientUserId(),
+                    appointment.getDoctorUserId(),
+                    appointment.getAppointmentDate(),
+                    AppointmentStatus.valueOf(appointment.getStatus()),
+                    appointment.getType(),
+                    appointment.getNotes()
+            );
 
-        gateway.create(medicalRecord);
+            gateway.create(medicalRecord);
+
+        } catch (Exception e) {
+            logger.error("Error creating medical record for appointment {}: {}",
+                    appointment.getId(), e.getMessage(), e);
+        }
     }
 
 }

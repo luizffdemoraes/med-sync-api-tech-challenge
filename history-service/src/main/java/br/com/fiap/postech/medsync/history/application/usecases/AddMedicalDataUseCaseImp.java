@@ -22,16 +22,24 @@ public class AddMedicalDataUseCaseImp implements AddMedicalDataUseCase {
         Optional<MedicalRecord> medicalRecordOpt = gateway.findByAppointmentId(event.getAppointmentId());
 
         if (medicalRecordOpt.isEmpty()) {
-            logger.error("Medical record not found for appointment {}", event.getAppointmentId());
+            logger.error("Medical record not found for appointment {}. Cannot add medical data. Event: {}",
+                    event.getAppointmentId(), event);
+            return;
         }
 
-        MedicalRecord medicalRecord = medicalRecordOpt.get();
+        try {
+            MedicalRecord medicalRecord = medicalRecordOpt.get();
 
-        medicalRecord.setChiefComplaint(event.getClinicalData().getChiefComplaint());
-        medicalRecord.setDiagnosis(event.getClinicalData().getDiagnosis());
-        medicalRecord.setPrescription(event.getClinicalData().getPrescription());
-        medicalRecord.setNotes(event.getClinicalData().getNotes());
+            medicalRecord.setChiefComplaint(event.getClinicalData().getChiefComplaint());
+            medicalRecord.setDiagnosis(event.getClinicalData().getDiagnosis());
+            medicalRecord.setPrescription(event.getClinicalData().getPrescription());
+            medicalRecord.setNotes(event.getClinicalData().getNotes());
 
-        gateway.update(medicalRecord);
+            gateway.update(medicalRecord);
+
+        } catch (Exception e) {
+            logger.error("Error updating medical data for appointment {}: {}",
+                    event.getAppointmentId(), e.getMessage(), e);
+        }
     }
 }

@@ -1,0 +1,21 @@
+type MedicalRecord {
+    id: ID!
+    appointmentId: ID!
+    patientUserId: ID!
+    doctorUserId: ID!
+    appointmentDate: String!
+    status: String!
+    type: String
+    chiefComplaint: String
+    diagnosis: String
+    prescription: String
+    notes: String
+    createdAt: String
+    updatedAt: String
+}
+
+type Query {
+    getMedicalRecordByAppointmentId(appointmentId: ID!): MedicalRecord
+    getPatientHistory(patientUserId: ID!): [MedicalRecord]
+    getAppointmentsByStatus(patientId: ID!, status: String!): [MedicalRecord]
+}

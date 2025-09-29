@@ -56,7 +56,7 @@ public class MedicalRecordEntity {
         entity.setPatientUserId(domain.getPatientUserId());
         entity.setDoctorUserId(domain.getDoctorUserId());
         entity.setAppointmentDate(domain.getAppointmentDate());
-        entity.setStatus(domain.getStatus() != null ? domain.getStatus().name() : null);
+        entity.setStatus(domain.getStatus() != null ? domain.getStatus() : null);
         entity.setType(domain.getType());
         entity.setChiefComplaint(domain.getChiefComplaint());
         entity.setDiagnosis(domain.getDiagnosis());
