@@ -26,6 +26,7 @@ public class CreateMedicalRecordUseCaseImp implements CreateMedicalRecordUseCase
 
         try {
             MedicalRecord medicalRecord = new MedicalRecord(
+                    null,
                     appointment.getId(),
                     appointment.getPatientUserId(),
                     appointment.getDoctorUserId(),

@@ -55,6 +55,10 @@ public class MedicalRecord {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public Long getId() { return id; }
+
+    public void setId(Long id) { this.id = id; }
+
     public Long getAppointmentId() {
         return appointmentId;
     }
@@ -103,14 +107,6 @@ public class MedicalRecord {
         this.type = type;
     }
 
-    public Integer getDurationMinutes() {
-        return durationMinutes;
-    }
-
-    public void setDurationMinutes(Integer durationMinutes) {
-        this.durationMinutes = durationMinutes;
-    }
-
     public String getChiefComplaint() {
         return chiefComplaint;
     }
@@ -157,13 +153,5 @@ public class MedicalRecord {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 }

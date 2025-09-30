@@ -50,6 +50,8 @@ public class MedicalRecordEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    public MedicalRecordEntity() {}
+
     public static MedicalRecordEntity fromDomain(MedicalRecord domain) {
         MedicalRecordEntity entity = new MedicalRecordEntity();
         entity.setAppointmentId(domain.getAppointmentId());

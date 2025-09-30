@@ -5,6 +5,7 @@ import br.com.fiap.postech.medsync.history.domain.gateways.MedicalRecordReposito
 import br.com.fiap.postech.medsync.history.infrastructure.gateways.MedicalRecordRepositoryGatewayImpl;
 import br.com.fiap.postech.medsync.history.infrastructure.messaging.AppointmentMessageConsumer;
 import br.com.fiap.postech.medsync.history.infrastructure.persistence.repository.MedicalRecordRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -44,7 +45,8 @@ public class DependencyInjectionConfig {
     @Bean
     public AppointmentMessageConsumer appointmentMessageConsumer(CreateMedicalRecordUseCase createMedicalRecordUseCase,
                                                                  UpdateAppointmentStatusUseCase updateAppointmentStatusUseCase,
-                                                                 AddMedicalDataUseCase addMedicalDataUseCase) {
-        return new AppointmentMessageConsumer(createMedicalRecordUseCase, updateAppointmentStatusUseCase, addMedicalDataUseCase);
+                                                                 AddMedicalDataUseCase addMedicalDataUseCase,
+                                                                 ObjectMapper objectMapper) {
+        return new AppointmentMessageConsumer(createMedicalRecordUseCase, updateAppointmentStatusUseCase, addMedicalDataUseCase, objectMapper);
     }
 }

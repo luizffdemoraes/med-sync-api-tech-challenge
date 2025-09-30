@@ -4,6 +4,8 @@ import br.com.fiap.postech.medsync.history.application.dtos.messaging.Appointmen
 import br.com.fiap.postech.medsync.history.application.dtos.messaging.AppointmentCompletedEvent;
 import br.com.fiap.postech.medsync.history.application.dtos.messaging.AppointmentCreatedEvent;
 import br.com.fiap.postech.medsync.history.application.dtos.messaging.MedicalDataAddedEvent;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -16,6 +18,26 @@ public class AppointmentMessageDTO {
     private Long appointmentId;
     private Map<String, Object> clinicalData;
     private Long updatedBy;
+
+    public AppointmentMessageDTO() {}
+
+    @JsonCreator
+    public AppointmentMessageDTO(
+            @JsonProperty("eventId") String eventId,
+            @JsonProperty("eventType") String eventType,
+            @JsonProperty("timestamp") String timestamp,
+            @JsonProperty("appointment") Map<String, Object> appointment,
+            @JsonProperty("appointmentId") Long appointmentId,
+            @JsonProperty("clinicalData") Map<String, Object> clinicalData,
+            @JsonProperty("updatedBy") Long updatedBy) {
+        this.eventId = eventId;
+        this.eventType = eventType;
+        this.timestamp = timestamp;
+        this.appointment = appointment;
+        this.appointmentId = appointmentId;
+        this.clinicalData = clinicalData;
+        this.updatedBy = updatedBy;
+    }
 
     public String getEventId() { return eventId; }
     public String getEventType() { return eventType; }
