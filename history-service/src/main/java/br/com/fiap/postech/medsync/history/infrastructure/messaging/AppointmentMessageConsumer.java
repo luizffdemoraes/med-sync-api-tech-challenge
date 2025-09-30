@@ -3,14 +3,19 @@ package br.com.fiap.postech.medsync.history.infrastructure.messaging;
 import br.com.fiap.postech.medsync.history.application.dtos.messaging.*;
 import br.com.fiap.postech.medsync.history.application.usecases.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 
 @Component
 public class AppointmentMessageConsumer {
+
+    private static final Logger logger = LoggerFactory.getLogger(AppointmentMessageConsumer.class);
 
     private final CreateMedicalRecordUseCase createMedicalRecordUseCase;
     private final UpdateAppointmentStatusUseCase updateAppointmentStatusUseCase;
@@ -30,35 +35,50 @@ public class AppointmentMessageConsumer {
 
     @RabbitListener(queues = "#{@appointmentQueue.name}")
     public void receive(Message message) {
+        String messageBody = null;
         try {
-            // Converte manualmente o payload de byte[] para String e depois para DTO
-            String messageBody = new String(message.getBody(), StandardCharsets.UTF_8);
-            System.out.println("Received raw message: " + messageBody);
-
+            messageBody = new String(message.getBody(), StandardCharsets.UTF_8);
             AppointmentMessageDTO messageDTO = objectMapper.readValue(messageBody, AppointmentMessageDTO.class);
 
-            String eventType = messageDTO.getEventType();
-            System.out.println("Processing event: " + eventType);
-
-            switch (eventType) {
-                case "APPOINTMENT_CREATED" ->
-                        createMedicalRecordUseCase.execute(messageDTO.toAppointmentCreatedEvent());
-                case "APPOINTMENT_COMPLETED" ->
-                        updateAppointmentStatusUseCase.execute(messageDTO.toAppointmentCompletedEvent());
-                case "MEDICAL_DATA_ADDED" ->
-                        addMedicalDataUseCase.execute(messageDTO.toMedicalDataAddedEvent());
-                case "APPOINTMENT_CANCELLED" ->
-                        updateAppointmentStatusUseCase.execute(messageDTO.toAppointmentCancelledEvent());
-                default ->
-                        throw new IllegalArgumentException("Evento não suportado: " + eventType);
+            // Validação básica do DTO
+            if (messageDTO.getEventType() == null || messageDTO.getAppointmentId() == null) {
+                logger.error("Mensagem inválida: eventType ou appointmentId está nulo. Mensagem: {}", messageBody);
+                throw new AmqpRejectAndDontRequeueException("Mensagem inválida: campos obrigatórios nulos");
             }
 
-            System.out.println("Event processed successfully: " + eventType);
+            String eventType = messageDTO.getEventType();
+            Long appointmentId = messageDTO.getAppointmentId();
+
+            switch (eventType) {
+                case "APPOINTMENT_CREATED" -> {
+                    logger.info("Processing APPOINTMENT_CREATED for appointment: {}", appointmentId);
+                    createMedicalRecordUseCase.execute(messageDTO.toAppointmentCreatedEvent());
+                }
+                case "APPOINTMENT_COMPLETED" -> {
+                    logger.info("Processing APPOINTMENT_COMPLETED for appointment: {}", appointmentId);
+                    updateAppointmentStatusUseCase.execute(messageDTO.toAppointmentCompletedEvent());
+                }
+                case "MEDICAL_DATA_ADDED" -> {
+                    logger.info("Processing MEDICAL_DATA_ADDED for appointment: {}", appointmentId);
+                    addMedicalDataUseCase.execute(messageDTO.toMedicalDataAddedEvent());
+                }
+                case "APPOINTMENT_CANCELLED" -> {
+                    logger.info("Processing APPOINTMENT_CANCELLED for appointment: {}", appointmentId);
+                    updateAppointmentStatusUseCase.execute(messageDTO.toAppointmentCancelledEvent());
+                }
+                default -> {
+                    logger.warn("Evento ignorado e removido da fila: {}. Mensagem: {}", eventType, messageBody);
+                    throw new AmqpRejectAndDontRequeueException("Event type não suportado: " + eventType);
+                }
+            }
+
+            logger.info("Evento processado com sucesso: {} - appointment: {}", eventType, appointmentId);
 
         } catch (Exception e) {
-            System.err.println("Error processing message: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Failed to process message", e);
+            logger.error("Erro processando mensagem: {}. Mensagem original: {}", e.getMessage(), messageBody);
+
+            // Para qualquer exceção, rejeita e não faz requeue
+            throw new AmqpRejectAndDontRequeueException("Failed to process message: " + e.getMessage(), e);
         }
     }
 }

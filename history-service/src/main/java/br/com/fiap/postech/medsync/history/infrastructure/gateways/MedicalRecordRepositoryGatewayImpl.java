@@ -34,6 +34,8 @@ public class MedicalRecordRepositoryGatewayImpl implements MedicalRecordReposito
     @Override
     public Optional<MedicalRecord> findByAppointmentId(Long appointmentId) {
         return medicalRecordRepository.findByAppointmentId(appointmentId)
+                .stream()
+                .findFirst()
                 .map(MedicalRecordEntity::toDomain);
     }
 

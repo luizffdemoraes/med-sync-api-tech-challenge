@@ -1,5 +1,7 @@
 package br.com.fiap.postech.medsync.history.infrastructure.config.rabbitmq;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -15,7 +17,12 @@ public class RabbitMQConfig {
     @Value("${app.rabbitmq.queue}")
     private String appointmentQueueName;
     public static final String APPOINTMENT_EXCHANGE = "appointment.exchange";
-    public static final String APPOINTMENT_ROUTING_KEY = "appointment.*";
+
+    // Routing keys específicas que queremos
+    public static final String APPOINTMENT_CREATED_KEY = "appointment.created";
+    public static final String APPOINTMENT_COMPLETED_KEY = "appointment.completed";
+    public static final String APPOINTMENT_CANCELLED_KEY = "appointment.cancelled";
+    public static final String MEDICAL_DATA_ADDED_KEY = "appointment.medical.updated";
 
     @Bean
     public TopicExchange appointmentExchange() {
@@ -24,19 +31,53 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue appointmentQueue() {
-        return new Queue(appointmentQueueName, true);
+        return QueueBuilder.durable(appointmentQueueName)
+                .withArgument("x-dead-letter-exchange", "") // DLX padrão
+                .withArgument("x-dead-letter-routing-key", "appointment.dlq") // Fila DLQ
+                .build();
+    }
+
+    // Fila DLQ para inspecionar mensagens problemáticas
+    @Bean
+    public Queue appointmentDLQ() {
+        return new Queue("appointment.dlq", true);
     }
 
     @Bean
     public MessageConverter jsonMessageConverter() {
-        return new Jackson2JsonMessageConverter();
+        ObjectMapper objectMapper = new ObjectMapper();
+        // Permite comentários no JSON
+        objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+        return new Jackson2JsonMessageConverter(objectMapper);
+    }
+
+    // Bindings específicos para cada evento que queremos consumir
+    @Bean
+    public Binding appointmentCreatedBinding(Queue appointmentQueue, TopicExchange appointmentExchange) {
+        return BindingBuilder.bind(appointmentQueue)
+                .to(appointmentExchange)
+                .with(APPOINTMENT_CREATED_KEY);
     }
 
     @Bean
-    public Binding appointmentBinding(Queue appointmentQueue, TopicExchange appointmentExchange) {
+    public Binding appointmentCompletedBinding(Queue appointmentQueue, TopicExchange appointmentExchange) {
         return BindingBuilder.bind(appointmentQueue)
                 .to(appointmentExchange)
-                .with(APPOINTMENT_ROUTING_KEY);
+                .with(APPOINTMENT_COMPLETED_KEY);
+    }
+
+    @Bean
+    public Binding appointmentCancelledBinding(Queue appointmentQueue, TopicExchange appointmentExchange) {
+        return BindingBuilder.bind(appointmentQueue)
+                .to(appointmentExchange)
+                .with(APPOINTMENT_CANCELLED_KEY);
+    }
+
+    @Bean
+    public Binding medicalDataAddedBinding(Queue appointmentQueue, TopicExchange appointmentExchange) {
+        return BindingBuilder.bind(appointmentQueue)
+                .to(appointmentExchange)
+                .with(MEDICAL_DATA_ADDED_KEY);
     }
 
     @Bean
