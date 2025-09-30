@@ -54,6 +54,7 @@ public class MedicalRecordEntity {
 
     public static MedicalRecordEntity fromDomain(MedicalRecord domain) {
         MedicalRecordEntity entity = new MedicalRecordEntity();
+        entity.setId(domain.getId());
         entity.setAppointmentId(domain.getAppointmentId());
         entity.setPatientUserId(domain.getPatientUserId());
         entity.setDoctorUserId(domain.getDoctorUserId());
@@ -71,6 +72,7 @@ public class MedicalRecordEntity {
 
     public MedicalRecord toDomain() {
         MedicalRecord domain = new MedicalRecord();
+        domain.setId(this.getId());
         domain.setAppointmentId(this.getAppointmentId());
         domain.setPatientUserId(this.getPatientUserId());
         domain.setDoctorUserId(this.getDoctorUserId());

@@ -32,10 +32,11 @@ CREATE TABLE history.medical_records
 
     -- ⏰ Metadados de controle
     created_at       TIMESTAMP            DEFAULT CURRENT_TIMESTAMP,
-    updated_at       TIMESTAMP            DEFAULT CURRENT_TIMESTAMP
-);
+    updated_at       TIMESTAMP            DEFAULT CURRENT_TIMESTAMP,
 
-ADD CONSTRAINT unique_appointment_id UNIQUE (appointment_id);
+        -- ✅ CONSTRAINT CORRIGIDA: DENTRO dos parênteses da tabela
+        CONSTRAINT unique_appointment_id UNIQUE (appointment_id)
+);
 
 -- =============================================
 -- ÍNDICES para performance das consultas GraphQL
