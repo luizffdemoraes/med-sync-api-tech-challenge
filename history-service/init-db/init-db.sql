@@ -35,6 +35,8 @@ CREATE TABLE history.medical_records
     updated_at       TIMESTAMP            DEFAULT CURRENT_TIMESTAMP
 );
 
+ADD CONSTRAINT unique_appointment_id UNIQUE (appointment_id);
+
 -- =============================================
 -- ÍNDICES para performance das consultas GraphQL
 -- =============================================

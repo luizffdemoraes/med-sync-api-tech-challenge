@@ -7,6 +7,8 @@ import br.com.fiap.postech.medsync.history.domain.gateways.MedicalRecordReposito
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
+
 public class CreateMedicalRecordUseCaseImp implements CreateMedicalRecordUseCase {
 
     private static final Logger logger = LoggerFactory.getLogger(CreateMedicalRecordUseCaseImp.class);
@@ -20,8 +22,21 @@ public class CreateMedicalRecordUseCaseImp implements CreateMedicalRecordUseCase
     public void execute(AppointmentCreatedEvent event) {
         AppointmentCreatedEvent.Appointment appointment = event.getAppointment();
 
-        if (gateway.findByAppointmentId(appointment.getId()).isPresent()) {
-            logger.warn("Medical record already exists for appointment {}", appointment.getId());
+        // ✅ VERIFICA se já existe e ATUALIZA em vez de criar novo
+        Optional<MedicalRecord> existingRecord = gateway.findByAppointmentId(appointment.getId());
+
+        if (existingRecord.isPresent()) {
+            logger.info("Medical record already exists for appointment {}, updating instead", appointment.getId());
+
+            // Atualiza o registro existente
+            MedicalRecord medicalRecord = existingRecord.get();
+            medicalRecord.setAppointmentDate(appointment.getAppointmentDate());
+            medicalRecord.setStatus(AppointmentStatus.valueOf(appointment.getStatus()));
+            medicalRecord.setType(appointment.getType());
+            medicalRecord.setNotes(appointment.getNotes()); // Atualiza notas se necessário
+
+            gateway.update(medicalRecord);
+            return; // ✅ IMPEDE criação de novo registro
         }
 
         try {
@@ -37,11 +52,11 @@ public class CreateMedicalRecordUseCaseImp implements CreateMedicalRecordUseCase
             );
 
             gateway.create(medicalRecord);
+            logger.info("Created new medical record for appointment {}", appointment.getId());
 
         } catch (Exception e) {
-            logger.error("Error creating medical record for appointment {}: {}",
+            logger.error("Error creating/updating medical record for appointment {}: {}",
                     appointment.getId(), e.getMessage(), e);
         }
     }
-
 }
