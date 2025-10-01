@@ -31,16 +31,7 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue appointmentQueue() {
-        return QueueBuilder.durable(appointmentQueueName)
-                .withArgument("x-dead-letter-exchange", "") // DLX padrão
-                .withArgument("x-dead-letter-routing-key", "appointment.dlq") // Fila DLQ
-                .build();
-    }
-
-    // Fila DLQ para inspecionar mensagens problemáticas
-    @Bean
-    public Queue appointmentDLQ() {
-        return new Queue("appointment.dlq", true);
+        return QueueBuilder.durable(appointmentQueueName).build();
     }
 
     @Bean
