@@ -393,6 +393,9 @@ target/site/jacoco/index.html
 
 ![notification-coverage](images/notification-coverage.png)
 
+### history-service
+
+![history-coverage](images/history-coverage.png)
 ---
 
 ## 🧪 Collection POSTMAN
