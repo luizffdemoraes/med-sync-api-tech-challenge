@@ -25,7 +25,7 @@
 ## 📌 Descrição do Projeto
 
 O **MedSync Healthcare System** é uma API modular e containerizada que oferece:
-
+* Cadastro de pacientes, medicos, enfermeiros, geração de token e autenticação .
 * Agendamento de consultas médicas.
 * Envio de notificações automáticas a pacientes.
 * Exposição do histórico clínico via **GraphQL**.
@@ -37,14 +37,20 @@ O sistema contempla perfis distintos (**DOCTOR, NURSE, PATIENT**) com permissõe
 
 ## ⚙️ Funcionalidades e Endpoints
 
+### 🔐 Auth Service
+
+
+
 ### 📅 Scheduling Service
 
-| Operação                 | Descrição                           | Acesso       |
-| ------------------------ | ----------------------------------- |--------------|
-| `POST /appointments`     | Criar nova consulta                 | DOCTOR/NURSE |
-| `PUT /appointments/{id}` | Editar uma consulta existente       | DOCTOR/NURSE |
-| `GET /appointments/{id}` | Visualizar detalhes de uma consulta | DOCTOR/NURSE |
-| `GET /appointments`      | Listar consultas (com filtros)      | DOCTOR/NURSE |
+| Operação                   | Descrição                                     | Acesso       |
+|----------------------------|-----------------------------------------------|--------------|
+| `POST /appointments`       | Criar nova consulta                           | DOCTOR/NURSE |
+| `PUT /appointments/{id}`   | Editar uma consulta existente                 | DOCTOR/NURSE |
+| `GET /appointments/{id}`   | Visualizar detalhes de uma consulta           | DOCTOR/NURSE |
+| `GET /appointments`        | Listar consultas (com filtros)                | DOCTOR/NURSE |
+| `DELETE /appointments`     | Cancelar consulta                             | DOCTOR/NURSE |
+| `Posta mensagens em filas` | Endereça mensagens para notifação e historico | Interno      |
 
 ---
 
@@ -124,49 +130,96 @@ scheduling-service/
 │   │   │   └── br/com/fiap/postech/medsync/scheduling/
 │   │   │       │
 │   │   │       ├── application/
-│   │   │       │   ├── controllers/
-│   │   │       │   │   └── AppointmentController.java
 │   │   │       │   ├── dtos/
-│   │   │       │   │   ├── requests/
-│   │   │       │   │   │   ├── CreateAppointmentRequest.java
-│   │   │       │   │   │   └── UpdateAppointmentRequest.java
-│   │   │       │   │   └── responses/
-│   │   │       │   │       └── AppointmentResponse.java
-│   │   │       │   └── gateways/
-│   │   │       │       └── NotificationGateway.java
+│   │   │       │   │   ├── AppointmentDTO.java
+│   │   │       │   │   ├── CancelAppointmentDTO.java
+│   │   │       │   │   ├── CreateAppointmentDTO.java
+│   │   │       │   │   ├── HistoryEventDTO.java
+│   │   │       │   │   ├── NotificationMessageDTO.java
+│   │   │       │   │   └── UpdateAppointmentDTO.java
+│   │   │       │   │
+│   │   │       │   └── usecases/
+│   │   │       │       ├── AddMedicalDataUseCase.java
+│   │   │       │       ├── AddMedicalDataUseCaseImp.java
+│   │   │       │       ├── CancelAppointmentUseCase.java
+│   │   │       │       ├── CancelAppointmentUseCaseImp.java
+│   │   │       │       ├── CompleteAppointmentUseCase.java
+│   │   │       │       ├── CompleteAppointmentUseCaseImp.java
+│   │   │       │       ├── CreateAppointmentUseCase.java
+│   │   │       │       ├── CreateAppointmentUseCaseImp.java
+│   │   │       │       ├── GetAppointmentUseCase.java
+│   │   │       │       ├── GetAppointmentUseCaseImp.java
+│   │   │       │       ├── ListAppointmentsUseCase.java
+│   │   │       │       ├── ListAppointmentsUseCaseImp.java
+│   │   │       │       ├── UpdateAppointmentUseCase.java
+│   │   │       │       └── UpdateAppointmentUseCaseImp.java
 │   │   │       │
 │   │   │       ├── domain/
 │   │   │       │   ├── entities/
-│   │   │       │   │   └── Appointment.java
-│   │   │       │   ├── gateways/
-│   │   │       │   │   └── AppointmentRepositoryGateway.java
-│   │   │       │   └── usecases/
-│   │   │       │       ├── CreateAppointmentUseCase.java
-│   │   │       │       ├── UpdateAppointmentUseCase.java
-│   │   │       │       └── CancelAppointmentUseCase.java
+│   │   │       │   │   ├── Appointment.java
+│   │   │       │   │   └── QueueEvent.java
+│   │   │       │   │
+│   │   │       │   ├── enums/
+│   │   │       │   │   ├── AppointmentStatus.java
+│   │   │       │   │   ├── AppointmentType.java
+│   │   │       │   │   ├── EventType.java
+│   │   │       │   │   └── QueueType.java
+│   │   │       │   │
+│   │   │       │   └── gateways/
+│   │   │       │       ├── AppointmentGateway.java
+│   │   │       │       └── QueueEventGateway.java
 │   │   │       │
 │   │   │       └── infrastructure/
 │   │   │           ├── config/
 │   │   │           │   ├── dependency/
-│   │   │           │   ├── security/
-│   │   │           │   └── RabbitMQConfig.java
+│   │   │           │   │   └── DependencyInjectionConfig.java
+│   │   │           │   │
+│   │   │           │   ├── rabbitmq/
+│   │   │           │   │   └── RabbitMQConfig.java
+│   │   │           │   │
+│   │   │           │   └── security/
+│   │   │           │       └── SecurityConfig.java
+│   │   │           │
+│   │   │           ├── controllers/
+│   │   │           │   └── AppointmentController.java
+│   │   │           │
 │   │   │           ├── exceptions/
-│   │   │           │   └── handler/
-│   │   │           ├── persistence/
-│   │   │           │   ├── entity/
-│   │   │           │   │   └── AppointmentJpaEntity.java
-│   │   │           │   └── repository/
-│   │   │           │       └── AppointmentRepository.java
-│   │   │           └── messaging/
-│   │   │               └── RabbitMQNotificationGateway.java
+│   │   │           │   ├── handler/
+│   │   │           │   │   └── GlobalExceptionHandler.java
+│   │   │           │   │
+│   │   │           │   ├── AppointmentNotFoundException.java
+│   │   │           │   ├── InvalidAppointmentException.java
+│   │   │           │   └── SchedulingConflictException.java
+│   │   │           │
+│   │   │           ├── gateways/
+│   │   │           │   ├── AppointmentGatewayImpl.java
+│   │   │           │   └── QueueEventGatewayImpl.java
+│   │   │           │
+│   │   │           ├── messaging/
+│   │   │           │   ├── HistoryEventProducer.java
+│   │   │           │   └── NotificationEventProducer.java
+│   │   │           │
+│   │   │           └── persistence/
+│   │   │               ├── entity/
+│   │   │               │   ├── AppointmentEntity.java
+│   │   │               │   └── QueueEventEntity.java
+│   │   │               │
+│   │   │               └── repository/
+│   │   │                   ├── AppointmentRepository.java
+│   │   │                   └── QueueEventRepository.java
 │   │   │
 │   │   └── resources/
 │   │       ├── application.properties
-│   │       └── db/migration/
+│   │       ├── application-local.properties
+│   │       ├── static/
+│   │       └── templates/
 │   │
 │   └── test/
-│       ├── java/... (estrutura espelhada)
-│       └── resources/
+│       └── java/... (estrutura espelhada)
+│
+├── init-db/
+│   └── 01-init.sql
+│
 ├── Dockerfile
 └── pom.xml
 ```
