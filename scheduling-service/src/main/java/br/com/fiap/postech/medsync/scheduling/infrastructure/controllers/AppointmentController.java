@@ -64,9 +64,9 @@ public class AppointmentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<AppointmentDTO> cancelAppointment(@PathVariable Long id,
-                                                            @RequestBody CancelAppointmentDTO request) {
-        AppointmentDTO appointment = cancelAppointmentUseCase.execute(id, request);
-        return ResponseEntity.ok(appointment);
+    public ResponseEntity<Void> cancelAppointment(@PathVariable Long id,
+                                                  @RequestBody CancelAppointmentDTO request) {
+        cancelAppointmentUseCase.execute(id, request);
+        return ResponseEntity.noContent().build();
     }
 }
