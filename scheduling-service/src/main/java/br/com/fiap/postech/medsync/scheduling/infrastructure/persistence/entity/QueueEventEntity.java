@@ -1,5 +1,6 @@
 package br.com.fiap.postech.medsync.scheduling.infrastructure.persistence.entity;
 
+import br.com.fiap.postech.medsync.scheduling.domain.entities.QueueEvent;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -47,6 +48,31 @@ public class QueueEventEntity {
         this.routingKey = routingKey;
         this.messageBody = messageBody;
         this.createdAt = LocalDateTime.now();
+    }
+
+    public static QueueEventEntity toEntity(QueueEvent queueEvent) {
+        QueueEventEntity entity = new QueueEventEntity();
+        entity.setEventType(queueEvent.getEventType());
+        entity.setQueueName(queueEvent.getSource());
+        entity.setRoutingKey(queueEvent.getRoutingKey());
+        entity.setMessageBody(queueEvent.getPayload());
+        entity.setStatus(queueEvent.getStatus());
+        entity.setErrorMessage(queueEvent.getError());
+        entity.setCreatedAt(queueEvent.getCreatedAt());
+        return entity;
+    }
+
+    public QueueEvent toDomain() {
+        QueueEvent queueEvent = new QueueEvent();
+        queueEvent.setEventType(this.getEventType());
+        queueEvent.setEventSubType(this.getRoutingKey());
+        queueEvent.setPayload(this.getMessageBody());
+        queueEvent.setStatus(this.getStatus());
+        queueEvent.setError(this.getErrorMessage());
+        queueEvent.setCreatedAt(this.getCreatedAt());
+        queueEvent.setRoutingKey(this.getRoutingKey());
+        queueEvent.setSource(this.getQueueName());
+        return queueEvent;
     }
 
     // Getters e setters

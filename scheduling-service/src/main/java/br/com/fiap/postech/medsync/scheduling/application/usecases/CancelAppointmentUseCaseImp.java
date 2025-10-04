@@ -1,4 +1,10 @@
 package br.com.fiap.postech.medsync.scheduling.application.usecases;
 
-public class CancelAppointmentUseCaseImp {
+import br.com.fiap.postech.medsync.scheduling.application.dtos.CancelAppointmentDTO;
+
+public class CancelAppointmentUseCaseImp implements CancelAppointmentUseCase{
+    @Override
+    public void execute(Long id, CancelAppointmentDTO request) {
+
+    }
 }

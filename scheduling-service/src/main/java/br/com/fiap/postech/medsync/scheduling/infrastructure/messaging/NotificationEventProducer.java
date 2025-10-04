@@ -6,7 +6,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-// infrastructure/messaging/producers/NotificationEventProducer.java
 @Component
 public class NotificationEventProducer {
 
@@ -17,6 +16,10 @@ public class NotificationEventProducer {
 
     public NotificationEventProducer(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
+    }
+
+    public void sendNotificationEvent(NotificationMessageDTO notification) {
+        rabbitTemplate.convertAndSend(notificationQueue, notification);
     }
 
     public void publishAppointmentEvent(AppointmentDTO appointment, String eventType) {

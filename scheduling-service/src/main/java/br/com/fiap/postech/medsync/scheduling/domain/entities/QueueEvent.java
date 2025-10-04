@@ -131,6 +131,18 @@ public class QueueEvent {
         return this.notificationEventType != null;
     }
 
+    // Java
+    public String getEventType() {
+        if (historyEventType != null) return historyEventType.name();
+        if (notificationEventType != null) return notificationEventType.name();
+        return null;
+    }
+
+    public String getEventSubType() {
+        return routingKey;
+    }
+
+
     // Geração de routing keys baseada nos exemplos
     private String generateHistoryRoutingKey(HistoryEventType eventType) {
         switch (eventType) {

@@ -1,5 +1,8 @@
 package br.com.fiap.postech.medsync.scheduling.infrastructure.persistence.entity;
 
+import br.com.fiap.postech.medsync.scheduling.domain.entities.Appointment;
+import br.com.fiap.postech.medsync.scheduling.domain.enums.AppointmentStatus;
+import br.com.fiap.postech.medsync.scheduling.domain.enums.AppointmentType;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -110,6 +113,44 @@ public class AppointmentEntity {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    // Conversão: Domain -> Entity
+    public static AppointmentEntity toEntity(Appointment appointment) {
+        if (appointment == null) return null;
+        AppointmentEntity entity = new AppointmentEntity();
+        entity.setId(appointment.getId());
+        entity.setPatientId(appointment.getPatientUserId());
+        entity.setDoctorId(appointment.getDoctorUserId());
+        entity.setDoctorSpecialty(appointment.getMedicalSpecialtyId() != null ? appointment.getMedicalSpecialtyId().toString() : null);
+        entity.setAppointmentDate(appointment.getAppointmentDate());
+        entity.setStatus(appointment.getStatus() != null ? appointment.getStatus().name() : null);
+        entity.setType(appointment.getType() != null ? appointment.getType().name() : null);
+        entity.setDurationMinutes(appointment.getDurationMinutes());
+        entity.setNotes(appointment.getNotes());
+        entity.setCancellationReason(appointment.getCancellationReason());
+        entity.setClinicalNotes(appointment.getClinicalData());
+        // O campo 'urgent' pode ser salvo como uma nota ou flag, conforme necessidade
+        return entity;
+    }
+
+    // Conversão: Entity -> Domain
+    public Appointment toDomain() {
+        Appointment appointment = new Appointment();
+        appointment.setId(this.getId());
+        appointment.setPatientUserId(this.getPatientId());
+        appointment.setDoctorUserId(this.getDoctorId());
+        appointment.setMedicalSpecialtyId(this.getDoctorSpecialty() != null ? Long.valueOf(this.getDoctorSpecialty()) : null);
+        appointment.setAppointmentDate(this.getAppointmentDate());
+        appointment.setStatus(this.getStatus() != null ? AppointmentStatus.valueOf(this.getStatus()) : null);
+        appointment.setType(this.getType() != null ? AppointmentType.valueOf(this.getType()) : null);
+        appointment.setDurationMinutes(this.getDurationMinutes());
+        appointment.setNotes(this.getNotes());
+        appointment.setCancellationReason(this.getCancellationReason());
+        appointment.setClinicalData(this.getClinicalNotes());
+        // O campo 'urgent' não está presente na entidade, pode ser tratado conforme regra de negócio
+        return appointment;
+    }
+
 
     // Getters e setters
     public Long getId() {

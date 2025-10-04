@@ -16,17 +16,23 @@ import org.springframework.web.bind.annotation.*;
 public class AppointmentController {
 
     private final CreateAppointmentUseCase createAppointmentUseCase;
+    private final AddMedicalDataUseCase addMedicalDataUseCase;
+    private final CompleteAppointmentUseCase completeAppointmentUseCase;
     private final UpdateAppointmentUseCase updateAppointmentUseCase;
     private final GetAppointmentUseCase getAppointmentUseCase;
     private final ListAppointmentsUseCase listAppointmentsUseCase;
     private final CancelAppointmentUseCase cancelAppointmentUseCase;
 
     public AppointmentController(CreateAppointmentUseCase createAppointmentUseCase,
+                                 AddMedicalDataUseCase addMedicalDataUseCase,
+                                 CompleteAppointmentUseCase completeAppointmentUseCase,
                                  UpdateAppointmentUseCase updateAppointmentUseCase,
                                  GetAppointmentUseCase getAppointmentUseCase,
                                  ListAppointmentsUseCase listAppointmentsUseCase,
                                  CancelAppointmentUseCase cancelAppointmentUseCase) {
         this.createAppointmentUseCase = createAppointmentUseCase;
+        this.addMedicalDataUseCase = addMedicalDataUseCase;
+        this.completeAppointmentUseCase = completeAppointmentUseCase;
         this.updateAppointmentUseCase = updateAppointmentUseCase;
         this.getAppointmentUseCase = getAppointmentUseCase;
         this.listAppointmentsUseCase = listAppointmentsUseCase;
@@ -43,6 +49,19 @@ public class AppointmentController {
     public ResponseEntity<AppointmentDTO> updateAppointment(@PathVariable Long id,
                                                             @RequestBody UpdateAppointmentDTO request) {
         AppointmentDTO appointment = updateAppointmentUseCase.execute(id, request);
+        return ResponseEntity.ok(appointment);
+    }
+
+    @PatchMapping("/{id}/medical-data")
+    public ResponseEntity<AppointmentDTO> addMedicalData(@PathVariable Long id,
+                                                         @RequestBody UpdateAppointmentDTO request) {
+        AppointmentDTO appointment = addMedicalDataUseCase.execute(id, request);
+        return ResponseEntity.ok(appointment);
+    }
+
+    @PatchMapping("/{id}/complete")
+    public ResponseEntity<AppointmentDTO> completeAppointment(@PathVariable Long id) {
+        AppointmentDTO appointment = completeAppointmentUseCase.execute(id);
         return ResponseEntity.ok(appointment);
     }
 

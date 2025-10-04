@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 
-// infrastructure/messaging/producers/HistoryEventProducer.java
 @Component
 public class HistoryEventProducer {
 
@@ -18,6 +17,17 @@ public class HistoryEventProducer {
 
     public HistoryEventProducer(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
+    }
+
+    public void sendHistoryEvent(HistoryEventDTO event) {
+        String routingKey = switch(event.getEventType()) {
+            case "APPOINTMENT_CREATED" -> RabbitMQConfig.APPOINTMENT_CREATED_KEY;
+            case "APPOINTMENT_COMPLETED" -> RabbitMQConfig.APPOINTMENT_COMPLETED_KEY;
+            case "APPOINTMENT_CANCELLED" -> RabbitMQConfig.APPOINTMENT_CANCELLED_KEY;
+            case "MEDICAL_DATA_ADDED" -> RabbitMQConfig.MEDICAL_DATA_ADDED_KEY;
+            default -> "appointment.unknown";
+        };
+        rabbitTemplate.convertAndSend(RabbitMQConfig.HISTORY_EXCHANGE, routingKey, event);
     }
 
     public void publishAppointmentCreated(AppointmentDTO appointment) {

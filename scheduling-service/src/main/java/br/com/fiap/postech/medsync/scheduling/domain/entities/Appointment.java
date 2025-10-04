@@ -1,5 +1,6 @@
 package br.com.fiap.postech.medsync.scheduling.domain.entities;
 
+import br.com.fiap.postech.medsync.scheduling.application.dtos.CreateAppointmentDTO;
 import br.com.fiap.postech.medsync.scheduling.domain.enums.AppointmentStatus;
 import br.com.fiap.postech.medsync.scheduling.domain.enums.AppointmentType;
 
@@ -14,56 +15,67 @@ public class Appointment {
     private AppointmentStatus status;
     private AppointmentType type;
     private String notes;
-    private Integer durationMinutes; // em minutos
+    private Integer durationMinutes;
     private boolean urgent;
     private String cancellationReason;
     private String clinicalData;
 
-    public Long getPatientUserId() {
-        return patientUserId;
+    public static Appointment fromCreateDTO(CreateAppointmentDTO request) {
+        Appointment appointment = new Appointment();
+        appointment.setPatientUserId(request.getPatientUserId());
+        appointment.setDoctorUserId(request.getDoctorUserId());
+        appointment.setAppointmentDate(request.getAppointmentDate());
+        appointment.setType(
+                request.getType() != null
+                        ? AppointmentType.valueOf(request.getType())
+                        : null
+        );
+        appointment.setDurationMinutes(request.getDurationMinutes());
+        appointment.setNotes(request.getNotes());
+        appointment.setStatus(AppointmentStatus.SCHEDULED);
+        // Campos opcionais
+        appointment.setUrgent(false);
+        appointment.setCancellationReason(null);
+        appointment.setClinicalData(null);
+        // Você pode configurar outros campos padrão aqui caso necessário
+
+        return appointment;
     }
 
-    public void setPatientUserId(Long patientUserId) {
-        this.patientUserId = patientUserId;
-    }
+    // Getters e setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public Long getDoctorUserId() {
-        return doctorUserId;
-    }
+    public Long getPatientUserId() { return patientUserId; }
+    public void setPatientUserId(Long patientUserId) { this.patientUserId = patientUserId; }
 
-    public void setDoctorUserId(Long doctorUserId) {
-        this.doctorUserId = doctorUserId;
-    }
+    public Long getDoctorUserId() { return doctorUserId; }
+    public void setDoctorUserId(Long doctorUserId) { this.doctorUserId = doctorUserId; }
 
-    public Long getMedicalSpecialtyId() {
-        return medicalSpecialtyId;
-    }
+    public Long getMedicalSpecialtyId() { return medicalSpecialtyId; }
+    public void setMedicalSpecialtyId(Long medicalSpecialtyId) { this.medicalSpecialtyId = medicalSpecialtyId; }
 
-    public void setMedicalSpecialtyId(Long medicalSpecialtyId) {
-        this.medicalSpecialtyId = medicalSpecialtyId;
-    }
+    public LocalDateTime getAppointmentDate() { return appointmentDate; }
+    public void setAppointmentDate(LocalDateTime appointmentDate) { this.appointmentDate = appointmentDate; }
 
-    public LocalDateTime getAppointmentDate() {
-        return appointmentDate;
-    }
+    public AppointmentStatus getStatus() { return status; }
+    public void setStatus(AppointmentStatus status) { this.status = status; }
 
-    public void setAppointmentDate(LocalDateTime appointmentDate) {
-        this.appointmentDate = appointmentDate;
-    }
+    public AppointmentType getType() { return type; }
+    public void setType(AppointmentType type) { this.type = type; }
 
-    public Integer getDurationMinutes() {
-        return durationMinutes;
-    }
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
 
-    public void setDurationMinutes(Integer durationMinutes) {
-        this.durationMinutes = durationMinutes;
-    }
+    public Integer getDurationMinutes() { return durationMinutes; }
+    public void setDurationMinutes(Integer durationMinutes) { this.durationMinutes = durationMinutes; }
 
-    public boolean isUrgent() {
-        return urgent;
-    }
+    public boolean isUrgent() { return urgent; }
+    public void setUrgent(boolean urgent) { this.urgent = urgent; }
 
-    public void setUrgent(boolean urgent) {
-        this.urgent = urgent;
-    }
+    public String getCancellationReason() { return cancellationReason; }
+    public void setCancellationReason(String cancellationReason) { this.cancellationReason = cancellationReason; }
+
+    public String getClinicalData() { return clinicalData; }
+    public void setClinicalData(String clinicalData) { this.clinicalData = clinicalData; }
 }

@@ -1,5 +1,6 @@
 package br.com.fiap.postech.medsync.scheduling.application.dtos;
 
+import br.com.fiap.postech.medsync.scheduling.domain.entities.Appointment;
 import br.com.fiap.postech.medsync.scheduling.domain.enums.AppointmentStatus;
 import br.com.fiap.postech.medsync.scheduling.domain.enums.AppointmentType;
 
@@ -45,6 +46,30 @@ public class AppointmentDTO {
         this.prescription = prescription;
         this.clinicalNotes = clinicalNotes;
         this.updatedBy = updatedBy;
+    }
+
+    // ... existing code ...
+    public static AppointmentDTO fromDomain(Appointment appointment) {
+        AppointmentDTO dto = new AppointmentDTO();
+        dto.setId(appointment.getId());
+        dto.setPatientUserId(appointment.getPatientUserId());
+        dto.setDoctorUserId(appointment.getDoctorUserId());
+        dto.setAppointmentDate(appointment.getAppointmentDate());
+        dto.setStatus(appointment.getStatus());
+        dto.setType(appointment.getType());
+        dto.setDurationMinutes(appointment.getDurationMinutes());
+        dto.setNotes(appointment.getNotes());
+        dto.setCancellationReason(appointment.getCancellationReason());
+        // Campos clínicos simples: popular conforme seu uso no domínio
+        dto.setClinicalNotes(appointment.getClinicalData());
+        // Demais campos (caso ainda não sejam usados no domínio, ficam null)
+        dto.setChiefComplaint(null);
+        dto.setDiagnosis(null);
+        dto.setPrescription(null);
+        dto.setUpdatedBy(null);
+        dto.setPatientEmail(null); // Carregue o e-mail do paciente conforme seu fluxo/repositório
+
+        return dto;
     }
 
     // Getters & Setters
