@@ -78,4 +78,13 @@ public class Appointment {
 
     public String getClinicalData() { return clinicalData; }
     public void setClinicalData(String clinicalData) { this.clinicalData = clinicalData; }
+
+    public void addMedicalData(String chiefComplaint, String diagnosis, String prescription, String notes) {
+        StringBuilder sb = new StringBuilder();
+        if (chiefComplaint != null) sb.append("Queixa principal: ").append(chiefComplaint).append("\n");
+        if (diagnosis != null) sb.append("Diagnóstico: ").append(diagnosis).append("\n");
+        if (prescription != null) sb.append("Prescrição: ").append(prescription).append("\n");
+        if (notes != null) sb.append("Notas: ").append(notes).append("\n");
+        this.clinicalData = sb.toString();
+    }
 }

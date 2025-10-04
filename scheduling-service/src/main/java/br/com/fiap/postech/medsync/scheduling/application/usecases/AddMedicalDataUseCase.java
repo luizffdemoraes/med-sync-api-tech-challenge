@@ -9,5 +9,5 @@ public interface AddMedicalDataUseCase {
      * Esta funcionalidade será tratada pelo UpdateAppointmentUseCase
      * através do UpdateAppointmentDTO
      */
-    AppointmentDTO execute(Long appointmentId, UpdateAppointmentDTO medicalData);
+    AppointmentDTO execute(Long appointmentId, AppointmentDTO medicalData);
 }

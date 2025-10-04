@@ -86,13 +86,12 @@ public class HistoryEventProducer {
         );
     }
 
-    public void publishMedicalDataAdded(AppointmentDTO appointment, String chiefComplaint,
-                                        String diagnosis, String prescription, String notes) {
+    public void publishMedicalDataAdded(AppointmentDTO appointment) {
         Map<String, Object> clinicalData = Map.of(
-                "chiefComplaint", chiefComplaint,
-                "diagnosis", diagnosis,
-                "prescription", prescription,
-                "notes", notes,
+                "chiefComplaint", appointment.getChiefComplaint(),
+                "diagnosis", appointment.getDiagnosis(),
+                "prescription", appointment.getPrescription(),
+                "notes", appointment.getNotes(),
                 "updatedBy", appointment.getDoctorUserId()
         );
 

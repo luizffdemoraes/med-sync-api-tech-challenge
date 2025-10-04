@@ -54,7 +54,7 @@ public class AppointmentController {
 
     @PatchMapping("/{id}/medical-data")
     public ResponseEntity<AppointmentDTO> addMedicalData(@PathVariable Long id,
-                                                         @RequestBody UpdateAppointmentDTO request) {
+                                                         @RequestBody AppointmentDTO request) {
         AppointmentDTO appointment = addMedicalDataUseCase.execute(id, request);
         return ResponseEntity.ok(appointment);
     }
