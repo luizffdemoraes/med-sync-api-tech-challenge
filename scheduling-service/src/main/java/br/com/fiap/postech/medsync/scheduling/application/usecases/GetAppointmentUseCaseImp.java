@@ -19,9 +19,6 @@ public class GetAppointmentUseCaseImp implements GetAppointmentUseCase {
                 .orElseThrow(() -> new RuntimeException("Appointment not found with id: " + id));
 
         // 2. Converte a entidade do domínio para DTO
-        AppointmentDTO appointmentDTO = AppointmentDTO.fromDomain(appointment);
-
-        // 3. Retorna o DTO
-        return appointmentDTO;
+        return AppointmentDTO.fromDomain(appointment);
     }
 }

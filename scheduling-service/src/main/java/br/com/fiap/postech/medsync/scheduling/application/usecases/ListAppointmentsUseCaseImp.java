@@ -20,9 +20,6 @@ public class ListAppointmentsUseCaseImp implements ListAppointmentsUseCase {
         Page<Appointment> appointments = appointmentGateway.findAll(patientId, doctorId, status, pageable);
 
         // 2. Converte as entidades do domínio para DTOs
-        Page<AppointmentDTO> appointmentDTOs = appointments.map(AppointmentDTO::fromDomain);
-
-        // 3. Retorna a página de DTOs
-        return appointmentDTOs;
+        return appointments.map(AppointmentDTO::fromDomain);
     }
 }
