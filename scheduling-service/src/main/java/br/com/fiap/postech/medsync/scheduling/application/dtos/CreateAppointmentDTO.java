@@ -1,6 +1,7 @@
 package br.com.fiap.postech.medsync.scheduling.application.dtos;
 
 import jakarta.validation.constraints.*;
+
 import java.time.LocalDateTime;
 
 public class CreateAppointmentDTO {

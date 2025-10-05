@@ -2,14 +2,11 @@ package br.com.fiap.postech.medsync.scheduling.infrastructure.config.dependency;
 
 import br.com.fiap.postech.medsync.scheduling.application.usecases.*;
 import br.com.fiap.postech.medsync.scheduling.domain.gateways.AppointmentGateway;
-import br.com.fiap.postech.medsync.scheduling.domain.gateways.QueueEventGateway;
 import br.com.fiap.postech.medsync.scheduling.infrastructure.controllers.AppointmentController;
 import br.com.fiap.postech.medsync.scheduling.infrastructure.gateways.AppointmentGatewayImpl;
-import br.com.fiap.postech.medsync.scheduling.infrastructure.gateways.QueueEventGatewayImpl;
 import br.com.fiap.postech.medsync.scheduling.infrastructure.messaging.HistoryEventProducer;
 import br.com.fiap.postech.medsync.scheduling.infrastructure.messaging.NotificationEventProducer;
 import br.com.fiap.postech.medsync.scheduling.infrastructure.persistence.repository.AppointmentRepository;
-import br.com.fiap.postech.medsync.scheduling.infrastructure.persistence.repository.QueueEventRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,15 +38,6 @@ public class DependencyInjectionConfig {
     @Bean
     public AppointmentGateway appointmentGateway(AppointmentRepository repository) {
         return new AppointmentGatewayImpl(repository);
-    }
-
-    @Bean
-    public QueueEventGateway queueEventGateway(
-            HistoryEventProducer historyEventProducer,
-            NotificationEventProducer notificationEventProducer,
-            QueueEventRepository queueEventRepository
-    ) {
-        return new QueueEventGatewayImpl(historyEventProducer, notificationEventProducer, queueEventRepository);
     }
 
     // USE CASES

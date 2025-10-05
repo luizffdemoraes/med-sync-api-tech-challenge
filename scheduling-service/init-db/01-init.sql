@@ -37,20 +37,3 @@ CREATE TABLE scheduling.appointments
     created_at          TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
     updated_at          TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 );
-
--- Tabela única para eventos das filas
-CREATE TABLE scheduling.queue_events
-(
-    id            BIGSERIAL PRIMARY KEY,
-    event_type    VARCHAR(50)  NOT NULL
-        CHECK (event_type IN ('NOTIFICATION', 'HISTORY')),
-    queue_name    VARCHAR(100) NOT NULL,
-    routing_key   VARCHAR(100) NOT NULL,
-    message_body  JSONB        NOT NULL,
-    status        VARCHAR(20) DEFAULT 'PENDING'
-        CHECK (status IN ('PENDING', 'SENT', 'FAILED')),
-    retry_count   INTEGER     DEFAULT 0,
-    created_at    TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-    sent_at       TIMESTAMP,
-    error_message TEXT
-);

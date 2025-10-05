@@ -18,13 +18,8 @@ public class NotificationEventProducer {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void sendNotificationEvent(NotificationMessageDTO notification) {
-        rabbitTemplate.convertAndSend(notificationQueue, notification);
-    }
-
     public void publishAppointmentEvent(AppointmentDTO appointment, String eventType) {
-        String message = String.format("Olá! Você tem uma consulta agendada para %s",
-                appointment.getAppointmentDate());
+        String message = buildMessage(eventType);
 
         NotificationMessageDTO notification = new NotificationMessageDTO(
                 appointment.getPatientUserId(),
@@ -36,5 +31,15 @@ public class NotificationEventProducer {
 
         // Envia DIRECT para a queue de notification
         rabbitTemplate.convertAndSend(notificationQueue, notification);
+    }
+
+
+    private String buildMessage(String eventType) {
+        return switch (eventType) {
+            case "CREATED" -> "Sua consulta foi agendada para %s. Chegue 15 minutos antes.";
+            case "UPDATED" -> "Sua consulta foi reagendada para %s. Confirme sua disponibilidade.";
+            case "CANCELLED" -> "Sua consulta para %s foi cancelada. Entre em contato para mais informações.";
+            default -> "Atualização sobre sua consulta: %s";
+        };
     }
 }
