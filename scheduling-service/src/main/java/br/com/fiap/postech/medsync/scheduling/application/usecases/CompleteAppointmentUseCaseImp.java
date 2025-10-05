@@ -23,13 +23,14 @@ public class CompleteAppointmentUseCaseImp implements CompleteAppointmentUseCase
     }
 
     @Override
-    public AppointmentDTO execute(Long appointmentId) {
+    public AppointmentDTO execute(Long appointmentId, Long updatedBy) {
         // 1. Busca a consulta existente
         Appointment existingAppointment = appointmentGateway.findById(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Appointment not found with id: " + appointmentId));
 
         // 2. Marca como completada
         existingAppointment.complete();
+        existingAppointment.setUpdatedBy(updatedBy);
 
         // 3. Atualiza a consulta no banco
         Appointment completedAppointment = appointmentGateway.update(existingAppointment);

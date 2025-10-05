@@ -1,6 +1,7 @@
 package br.com.fiap.postech.medsync.scheduling.application.usecases;
 
 import br.com.fiap.postech.medsync.scheduling.application.dtos.AppointmentDTO;
+import br.com.fiap.postech.medsync.scheduling.application.dtos.MedicalDataRequestDTO;
 import br.com.fiap.postech.medsync.scheduling.domain.entities.Appointment;
 import br.com.fiap.postech.medsync.scheduling.domain.gateways.AppointmentGateway;
 import br.com.fiap.postech.medsync.scheduling.infrastructure.messaging.HistoryEventProducer;
@@ -24,7 +25,7 @@ public class AddMedicalDataUseCaseImp implements AddMedicalDataUseCase {
     }
 
     @Override
-    public AppointmentDTO execute(Long appointmentId, AppointmentDTO medicalData) {
+    public AppointmentDTO execute(Long appointmentId, MedicalDataRequestDTO medicalData) {
         // 1. Busca a consulta existente
         Appointment existingAppointment = appointmentGateway.findById(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Appointment not found with id: " + appointmentId));
@@ -45,7 +46,7 @@ public class AddMedicalDataUseCaseImp implements AddMedicalDataUseCase {
         AppointmentDTO appointmentDTO = AppointmentDTO.fromDomain(updatedAppointment);
 
         // 5. Dispara evento histórico (MEDICAL_DATA_ADDED)
-        historyEventProducer.publishMedicalDataAdded(medicalData);
+        historyEventProducer.publishMedicalDataAdded(appointmentId, medicalData);
 
         // 6. Dispara notificação (UPDATED)
         notificationEventProducer.publishAppointmentEvent(appointmentDTO, "UPDATED");

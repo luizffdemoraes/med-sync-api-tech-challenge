@@ -9,5 +9,5 @@ public interface CompleteAppointmentUseCase {
      * Esta operação atualiza o status da consulta para finalizado
      * e pode disparar eventos relacionados ao término
      */
-    AppointmentDTO execute(Long appointmentId);
+    AppointmentDTO execute(Long appointmentId, Long updatedBy);
 }

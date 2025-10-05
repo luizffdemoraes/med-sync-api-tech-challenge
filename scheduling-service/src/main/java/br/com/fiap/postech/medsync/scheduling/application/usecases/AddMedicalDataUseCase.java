@@ -1,6 +1,7 @@
 package br.com.fiap.postech.medsync.scheduling.application.usecases;
 
 import br.com.fiap.postech.medsync.scheduling.application.dtos.AppointmentDTO;
+import br.com.fiap.postech.medsync.scheduling.application.dtos.MedicalDataRequestDTO;
 
 public interface AddMedicalDataUseCase {
     /**
@@ -8,5 +9,5 @@ public interface AddMedicalDataUseCase {
      * Esta funcionalidade será tratada pelo UpdateAppointmentUseCase
      * através do UpdateAppointmentDTO
      */
-    AppointmentDTO execute(Long appointmentId, AppointmentDTO medicalData);
+    AppointmentDTO execute(Long appointmentId, MedicalDataRequestDTO medicalData);
 }

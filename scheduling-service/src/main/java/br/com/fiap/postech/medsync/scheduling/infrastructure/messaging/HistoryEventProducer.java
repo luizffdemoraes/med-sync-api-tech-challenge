@@ -2,6 +2,7 @@ package br.com.fiap.postech.medsync.scheduling.infrastructure.messaging;
 
 import br.com.fiap.postech.medsync.scheduling.application.dtos.AppointmentDTO;
 import br.com.fiap.postech.medsync.scheduling.application.dtos.HistoryEventDTO;
+import br.com.fiap.postech.medsync.scheduling.application.dtos.MedicalDataRequestDTO;
 import br.com.fiap.postech.medsync.scheduling.infrastructure.config.rabbitmq.RabbitMQConfig;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
@@ -86,18 +87,18 @@ public class HistoryEventProducer {
         );
     }
 
-    public void publishMedicalDataAdded(AppointmentDTO appointment) {
+    public void publishMedicalDataAdded(Long appointmentId, MedicalDataRequestDTO appointment) {
         Map<String, Object> clinicalData = Map.of(
                 "chiefComplaint", appointment.getChiefComplaint(),
                 "diagnosis", appointment.getDiagnosis(),
                 "prescription", appointment.getPrescription(),
-                "notes", appointment.getNotes(),
-                "updatedBy", appointment.getDoctorUserId()
+                "notes", appointment.getClinicalNotes(),
+                "updatedBy", appointment.getUpdatedBy()
         );
 
         HistoryEventDTO event = createHistoryEvent(
                 "MEDICAL_DATA_ADDED",
-                appointment.getId(),
+                appointmentId,
                 clinicalData,
                 RabbitMQConfig.MEDICAL_DATA_ADDED_KEY
         );

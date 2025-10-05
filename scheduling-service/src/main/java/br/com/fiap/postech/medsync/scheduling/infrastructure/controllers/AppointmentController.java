@@ -3,6 +3,7 @@ package br.com.fiap.postech.medsync.scheduling.infrastructure.controllers;
 import br.com.fiap.postech.medsync.scheduling.application.dtos.AppointmentDTO;
 import br.com.fiap.postech.medsync.scheduling.application.dtos.CancelAppointmentDTO;
 import br.com.fiap.postech.medsync.scheduling.application.dtos.CreateAppointmentDTO;
+import br.com.fiap.postech.medsync.scheduling.application.dtos.MedicalDataRequestDTO;
 import br.com.fiap.postech.medsync.scheduling.application.usecases.*;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -44,14 +45,15 @@ public class AppointmentController {
 
     @PatchMapping("/{id}/medical-data")
     public ResponseEntity<AppointmentDTO> addMedicalData(@PathVariable Long id,
-                                                         @RequestBody AppointmentDTO request) {
+                                                         @RequestBody MedicalDataRequestDTO request) {
         AppointmentDTO appointment = addMedicalDataUseCase.execute(id, request);
         return ResponseEntity.ok(appointment);
     }
 
     @PatchMapping("/{id}/complete")
-    public ResponseEntity<AppointmentDTO> completeAppointment(@PathVariable Long id) {
-        AppointmentDTO appointment = completeAppointmentUseCase.execute(id);
+    public ResponseEntity<AppointmentDTO> completeAppointment(@PathVariable Long id,
+                                                              @RequestParam Long updatedBy) {
+        AppointmentDTO appointment = completeAppointmentUseCase.execute(id, updatedBy);
         return ResponseEntity.ok(appointment);
     }
 
