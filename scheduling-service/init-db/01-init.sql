@@ -20,8 +20,8 @@ CREATE TABLE scheduling.appointments
     appointment_date    TIMESTAMP    NOT NULL,
     status              VARCHAR(20) DEFAULT 'SCHEDULED'
         CHECK (status IN ('SCHEDULED', 'COMPLETED', 'CANCELLED')),
-    type                VARCHAR(50) DEFAULT 'CONSULTA'
-        CHECK (type IN ('CONSULTA', 'RETORNO', 'EXAME', 'CIRURGIA')),
+    type                VARCHAR(50) DEFAULT 'CONSULTATION'
+        CHECK (type IN ('CONSULTATION', 'FOLLOW_UP', 'EXAM', 'SURGERY')),
     duration_minutes    INTEGER     DEFAULT 30,
     notes               TEXT,
     cancellation_reason TEXT,
@@ -54,29 +54,3 @@ CREATE TABLE scheduling.queue_events
     sent_at       TIMESTAMP,
     error_message TEXT
 );
-
--- ======================
--- Dados iniciais de teste
--- ======================
-
--- Dados de exemplo para testes
-INSERT INTO scheduling.appointments (
-    patient_id,
-    patient_email,
-    doctor_id,
-    appointment_date,
-    status,
-    type,
-    duration_minutes,
-    notes
-)
-VALUES (
-           101,
-           'lffm1994@gmail.com',
-           201,
-           '2024-04-01 14:30:00',
-           'SCHEDULED',
-           'CONSULTA',
-           30,
-           'Primeira consulta de rotina'
-       );

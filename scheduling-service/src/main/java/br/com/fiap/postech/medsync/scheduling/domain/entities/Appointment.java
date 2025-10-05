@@ -28,6 +28,7 @@ public class Appointment {
     public static Appointment fromCreateDTO(CreateAppointmentDTO request) {
         Appointment appointment = new Appointment();
         appointment.setPatientUserId(request.getPatientUserId());
+        appointment.setPatientEmail(request.getPatientEmail());
         appointment.setDoctorUserId(request.getDoctorUserId());
         appointment.setAppointmentDate(request.getAppointmentDate());
         appointment.setType(
