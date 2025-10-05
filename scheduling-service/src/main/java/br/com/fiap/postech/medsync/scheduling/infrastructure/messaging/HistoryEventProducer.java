@@ -20,17 +20,6 @@ public class HistoryEventProducer {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void sendHistoryEvent(HistoryEventDTO event) {
-        String routingKey = switch(event.getEventType()) {
-            case "APPOINTMENT_CREATED" -> RabbitMQConfig.APPOINTMENT_CREATED_KEY;
-            case "APPOINTMENT_COMPLETED" -> RabbitMQConfig.APPOINTMENT_COMPLETED_KEY;
-            case "APPOINTMENT_CANCELLED" -> RabbitMQConfig.APPOINTMENT_CANCELLED_KEY;
-            case "MEDICAL_DATA_ADDED" -> RabbitMQConfig.MEDICAL_DATA_ADDED_KEY;
-            default -> "appointment.unknown";
-        };
-        rabbitTemplate.convertAndSend(RabbitMQConfig.HISTORY_EXCHANGE, routingKey, event);
-    }
-
     public void publishAppointmentCreated(AppointmentDTO appointment) {
         HistoryEventDTO event = createHistoryEvent(
                 "APPOINTMENT_CREATED",
