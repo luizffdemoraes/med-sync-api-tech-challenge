@@ -4,12 +4,12 @@ package br.com.fiap.postech.medsync.scheduling.domain.entities;
 import java.time.LocalDateTime;
 
 public class QueueEvent {
-    private Long id; // ✅ MUDAR: UUID → Long para compatibilidade com BD
-    private String eventType; // ✅ "HISTORY" ou "NOTIFICATION"
+    private Long id;
+    private String eventType; //  "HISTORY" ou "NOTIFICATION"
     private String queueName;
     private String routingKey;
-    private String messageBody; // ✅ JSON como string
-    private String status; // ✅ "PENDING", "SENT", "FAILED"
+    private String messageBody; // JSON como string
+    private String status; //  "PENDING", "SENT", "FAILED"
     private Integer retryCount;
     private LocalDateTime createdAt;
     private LocalDateTime sentAt;

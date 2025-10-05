@@ -390,6 +390,7 @@ history-service/
 * [Maven](https://maven.apache.org/)
 * [Docker](https://www.docker.com/)
 * [Postman](https://www.postman.com/)
+* [Mailtrap](https://mailtrap.io/)
 
 ---
 
@@ -410,6 +411,7 @@ history-service/
 
 3. **Acesse os serviços:**
 
+   * Auth [http://localhost:8079](http://localhost:8079)
    * Scheduling: [http://localhost:8080](http://localhost:8080)
    * History (GraphQL): [http://localhost:8081/graphql](http://localhost:8081/graphql)
    * Notification: [http://localhost:8082](http://localhost:8082)
@@ -442,6 +444,10 @@ target/site/jacoco/index.html
 ```
 
 ### Exemplo da cobertura gerada:
+
+### scheduling-service
+
+![scheduling-coverage](images/scheduling-coverage.png)
 
 ### notification-service
 

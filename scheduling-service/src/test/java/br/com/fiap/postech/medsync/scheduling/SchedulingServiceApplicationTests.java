@@ -1,4 +1,4 @@
-package br.com.fiap.postech.medsync.scheduling_service;
+package br.com.fiap.postech.medsync.scheduling;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
