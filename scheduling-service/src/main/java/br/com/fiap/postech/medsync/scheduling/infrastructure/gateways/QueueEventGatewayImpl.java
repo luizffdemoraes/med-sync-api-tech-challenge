@@ -1,19 +1,12 @@
 package br.com.fiap.postech.medsync.scheduling.infrastructure.gateways;
 
-import br.com.fiap.postech.medsync.scheduling.application.dtos.HistoryEventDTO;
-import br.com.fiap.postech.medsync.scheduling.application.dtos.NotificationMessageDTO;
 import br.com.fiap.postech.medsync.scheduling.domain.entities.QueueEvent;
-import br.com.fiap.postech.medsync.scheduling.domain.enums.HistoryEventType;
-import br.com.fiap.postech.medsync.scheduling.domain.enums.NotificationEventType;
 import br.com.fiap.postech.medsync.scheduling.domain.gateways.QueueEventGateway;
 import br.com.fiap.postech.medsync.scheduling.infrastructure.messaging.HistoryEventProducer;
 import br.com.fiap.postech.medsync.scheduling.infrastructure.messaging.NotificationEventProducer;
 import br.com.fiap.postech.medsync.scheduling.infrastructure.persistence.entity.QueueEventEntity;
 import br.com.fiap.postech.medsync.scheduling.infrastructure.persistence.repository.QueueEventRepository;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class QueueEventGatewayImpl implements QueueEventGateway {

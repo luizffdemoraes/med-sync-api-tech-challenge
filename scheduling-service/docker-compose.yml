@@ -38,6 +38,22 @@ services:
       timeout: 5s
       retries: 5
 
+  scheduling-service:
+    build: .
+    container_name: medsync-scheduling-service
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - ~/.m2:/root/.m2
+
 volumes:
   postgres_data:
   rabbitmq_data:
