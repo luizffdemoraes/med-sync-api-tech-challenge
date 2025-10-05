@@ -10,6 +10,7 @@ public class AddMedicalDataUseCaseImp implements AddMedicalDataUseCase {
 
     private final AppointmentGateway appointmentGateway;
     private final HistoryEventProducer historyEventProducer;
+
     private final NotificationEventProducer notificationEventProducer;
 
     public AddMedicalDataUseCaseImp(
@@ -33,7 +34,8 @@ public class AddMedicalDataUseCaseImp implements AddMedicalDataUseCase {
                 medicalData.getChiefComplaint(),
                 medicalData.getDiagnosis(),
                 medicalData.getPrescription(),
-                medicalData.getNotes()
+                medicalData.getClinicalNotes(),
+                medicalData.getUpdatedBy()
         );
 
         // 3. Atualiza a consulta no banco

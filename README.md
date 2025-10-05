@@ -43,14 +43,15 @@ O sistema contempla perfis distintos (**DOCTOR, NURSE, PATIENT**) com permissõe
 
 ### 📅 Scheduling Service
 
-| Operação                   | Descrição                                     | Acesso       |
-|----------------------------|-----------------------------------------------|--------------|
-| `POST /appointments`       | Criar nova consulta                           | DOCTOR/NURSE |
-| `PUT /appointments/{id}`   | Editar uma consulta existente                 | DOCTOR/NURSE |
-| `GET /appointments/{id}`   | Visualizar detalhes de uma consulta           | DOCTOR/NURSE |
-| `GET /appointments`        | Listar consultas (com filtros)                | DOCTOR/NURSE |
-| `DELETE /appointments`     | Cancelar consulta                             | DOCTOR/NURSE |
-| `Posta mensagens em filas` | Endereça mensagens para notifação e historico | Interno      |
+| Operação                                | Descrição                                                                                        | Acesso       |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------ |
+| `POST /appointments`                    | Cria uma nova consulta médica                                                                    | DOCTOR/NURSE |
+| `GET /appointments/{id}`                | Retorna os detalhes de uma consulta específica                                                   | DOCTOR/NURSE |
+| `GET /appointments`                     | Lista consultas com filtros opcionais (`patientId`, `doctorId`, `status`)                        | DOCTOR/NURSE |
+| `DELETE /appointments/{id}`             | Cancela uma consulta existente                                                                   | DOCTOR/NURSE |
+| `PATCH /appointments/{id}/complete`     | Marca uma consulta como **COMPLETED**                                                            | DOCTOR/NURSE |
+| `PATCH /appointments/{id}/medical-data` | Adiciona dados médicos à consulta (ex.: prescrições, observações)                                | DOCTOR/NURSE |
+| `Posta mensagens em filas`              | Envia eventos para histórico e notificação (`HistoryEventProducer`, `NotificationEventProducer`) | Interno      |
 
 ---
 

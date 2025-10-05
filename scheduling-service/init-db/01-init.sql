@@ -9,19 +9,14 @@ CREATE TABLE scheduling.appointments
 (
     id                  BIGSERIAL PRIMARY KEY,
 
-    -- Dados do Paciente (para notificação)
+    -- Dados do Paciente (para notificação) - ✅ ADERENTE AOS EVENTOS
     patient_id          BIGINT       NOT NULL,
-    patient_name        VARCHAR(255) NOT NULL,
     patient_email       VARCHAR(255) NOT NULL,
-    patient_phone       VARCHAR(20),
 
-    -- Dados do Médico (para histórico)
+    -- Dados do Médico (para histórico) - ✅ ADERENTE AOS EVENTOS
     doctor_id           BIGINT       NOT NULL,
-    doctor_name         VARCHAR(255) NOT NULL,
-    doctor_crm          VARCHAR(20),
-    doctor_specialty    VARCHAR(100),
 
-    -- Dados do Agendamento
+    -- Dados do Agendamento - ✅ ADERENTE AOS EVENTOS
     appointment_date    TIMESTAMP    NOT NULL,
     status              VARCHAR(20) DEFAULT 'SCHEDULED'
         CHECK (status IN ('SCHEDULED', 'COMPLETED', 'CANCELLED')),
@@ -31,15 +26,14 @@ CREATE TABLE scheduling.appointments
     notes               TEXT,
     cancellation_reason TEXT,
 
-    -- Dados Clínicos (para evento MEDICAL_DATA_ADDED)
+    -- Dados Clínicos (para evento MEDICAL_DATA_ADDED) - ✅ ADERENTE AOS EVENTOS
     chief_complaint     TEXT,
     diagnosis           TEXT,
     prescription        TEXT,
     clinical_notes      TEXT,
-    updated_by          BIGINT,
+    updated_by          BIGINT, -- ✅ NOVO CAMPO PARA MEDICAL_DATA_ADDED
 
     -- Controle
-    created_by          BIGINT,
     created_at          TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
     updated_at          TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 );
@@ -66,31 +60,23 @@ CREATE TABLE scheduling.queue_events
 -- ======================
 
 -- Dados de exemplo para testes
-INSERT INTO scheduling.appointments (patient_id,
-                                     patient_user_id,
-                                     patient_name,
-                                     patient_email,
-                                     patient_phone,
-                                     doctor_id,
-                                     doctor_user_id,
-                                     doctor_name,
-                                     doctor_crm,
-                                     doctor_specialty,
-                                     appointment_date,
-                                     type,
-                                     duration_minutes,
-                                     notes)
-VALUES (1,
-        101,
-        'Luiz Moraes',
-        'lffm1994@gmail.com',
-        '11999998888',
-        1,
-        201,
-        'Dra. Maria Santos',
-        'CRM/SP-123456',
-        'Cardiologia',
-        '2024-04-01 14:30:00',
-        'SCHEDULED',
-        30,
-        'Primeira consulta de rotina');
+INSERT INTO scheduling.appointments (
+    patient_id,
+    patient_email,
+    doctor_id,
+    appointment_date,
+    status,
+    type,
+    duration_minutes,
+    notes
+)
+VALUES (
+           101,
+           'lffm1994@gmail.com',
+           201,
+           '2024-04-01 14:30:00',
+           'SCHEDULED',
+           'CONSULTA',
+           30,
+           'Primeira consulta de rotina'
+       );

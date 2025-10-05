@@ -53,25 +53,29 @@ public class QueueEventEntity {
     public static QueueEventEntity toEntity(QueueEvent queueEvent) {
         QueueEventEntity entity = new QueueEventEntity();
         entity.setEventType(queueEvent.getEventType());
-        entity.setQueueName(queueEvent.getSource());
+        entity.setQueueName(queueEvent.getQueueName()); // ✅ CORRETO
         entity.setRoutingKey(queueEvent.getRoutingKey());
-        entity.setMessageBody(queueEvent.getPayload());
+        entity.setMessageBody(queueEvent.getMessageBody());
         entity.setStatus(queueEvent.getStatus());
-        entity.setErrorMessage(queueEvent.getError());
+        entity.setRetryCount(queueEvent.getRetryCount());
         entity.setCreatedAt(queueEvent.getCreatedAt());
+        entity.setSentAt(queueEvent.getSentAt());
+        entity.setErrorMessage(queueEvent.getErrorMessage());
         return entity;
     }
 
     public QueueEvent toDomain() {
         QueueEvent queueEvent = new QueueEvent();
+        queueEvent.setId(this.getId());
         queueEvent.setEventType(this.getEventType());
-        queueEvent.setEventSubType(this.getRoutingKey());
-        queueEvent.setPayload(this.getMessageBody());
-        queueEvent.setStatus(this.getStatus());
-        queueEvent.setError(this.getErrorMessage());
-        queueEvent.setCreatedAt(this.getCreatedAt());
+        queueEvent.setQueueName(this.getQueueName()); // ✅ CORRETO
         queueEvent.setRoutingKey(this.getRoutingKey());
-        queueEvent.setSource(this.getQueueName());
+        queueEvent.setMessageBody(this.getMessageBody());
+        queueEvent.setStatus(this.getStatus());
+        queueEvent.setRetryCount(this.getRetryCount());
+        queueEvent.setCreatedAt(this.getCreatedAt());
+        queueEvent.setSentAt(this.getSentAt());
+        queueEvent.setErrorMessage(this.getErrorMessage());
         return queueEvent;
     }
 

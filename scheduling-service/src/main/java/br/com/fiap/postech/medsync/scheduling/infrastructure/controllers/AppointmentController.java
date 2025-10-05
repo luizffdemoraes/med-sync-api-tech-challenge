@@ -3,7 +3,6 @@ package br.com.fiap.postech.medsync.scheduling.infrastructure.controllers;
 import br.com.fiap.postech.medsync.scheduling.application.dtos.AppointmentDTO;
 import br.com.fiap.postech.medsync.scheduling.application.dtos.CancelAppointmentDTO;
 import br.com.fiap.postech.medsync.scheduling.application.dtos.CreateAppointmentDTO;
-import br.com.fiap.postech.medsync.scheduling.application.dtos.UpdateAppointmentDTO;
 import br.com.fiap.postech.medsync.scheduling.application.usecases.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +17,6 @@ public class AppointmentController {
     private final CreateAppointmentUseCase createAppointmentUseCase;
     private final AddMedicalDataUseCase addMedicalDataUseCase;
     private final CompleteAppointmentUseCase completeAppointmentUseCase;
-    private final UpdateAppointmentUseCase updateAppointmentUseCase;
     private final GetAppointmentUseCase getAppointmentUseCase;
     private final ListAppointmentsUseCase listAppointmentsUseCase;
     private final CancelAppointmentUseCase cancelAppointmentUseCase;
@@ -26,14 +24,12 @@ public class AppointmentController {
     public AppointmentController(CreateAppointmentUseCase createAppointmentUseCase,
                                  AddMedicalDataUseCase addMedicalDataUseCase,
                                  CompleteAppointmentUseCase completeAppointmentUseCase,
-                                 UpdateAppointmentUseCase updateAppointmentUseCase,
                                  GetAppointmentUseCase getAppointmentUseCase,
                                  ListAppointmentsUseCase listAppointmentsUseCase,
                                  CancelAppointmentUseCase cancelAppointmentUseCase) {
         this.createAppointmentUseCase = createAppointmentUseCase;
         this.addMedicalDataUseCase = addMedicalDataUseCase;
         this.completeAppointmentUseCase = completeAppointmentUseCase;
-        this.updateAppointmentUseCase = updateAppointmentUseCase;
         this.getAppointmentUseCase = getAppointmentUseCase;
         this.listAppointmentsUseCase = listAppointmentsUseCase;
         this.cancelAppointmentUseCase = cancelAppointmentUseCase;
@@ -42,13 +38,6 @@ public class AppointmentController {
     @PostMapping
     public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody CreateAppointmentDTO request) {
         AppointmentDTO appointment = createAppointmentUseCase.execute(request);
-        return ResponseEntity.ok(appointment);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<AppointmentDTO> updateAppointment(@PathVariable Long id,
-                                                            @RequestBody UpdateAppointmentDTO request) {
-        AppointmentDTO appointment = updateAppointmentUseCase.execute(id, request);
         return ResponseEntity.ok(appointment);
     }
 
@@ -63,6 +52,13 @@ public class AppointmentController {
     public ResponseEntity<AppointmentDTO> completeAppointment(@PathVariable Long id) {
         AppointmentDTO appointment = completeAppointmentUseCase.execute(id);
         return ResponseEntity.ok(appointment);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> cancelAppointment(@PathVariable Long id,
+                                                  @RequestBody CancelAppointmentDTO request) {
+        cancelAppointmentUseCase.execute(id, request);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
@@ -80,12 +76,5 @@ public class AppointmentController {
 
         Page<AppointmentDTO> appointments = listAppointmentsUseCase.execute(patientId, doctorId, status, pageable);
         return ResponseEntity.ok(appointments);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> cancelAppointment(@PathVariable Long id,
-                                                  @RequestBody CancelAppointmentDTO request) {
-        cancelAppointmentUseCase.execute(id, request);
-        return ResponseEntity.noContent().build();
     }
 }

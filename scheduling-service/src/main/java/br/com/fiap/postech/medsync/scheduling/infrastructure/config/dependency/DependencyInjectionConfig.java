@@ -23,7 +23,6 @@ public class DependencyInjectionConfig {
             CreateAppointmentUseCase createAppointmentUseCase,
             AddMedicalDataUseCase addMedicalDataUseCase,
             CompleteAppointmentUseCase completeAppointmentUseCase,
-            UpdateAppointmentUseCase updateAppointmentUseCase,
             GetAppointmentUseCase getAppointmentUseCase,
             ListAppointmentsUseCase listAppointmentsUseCase,
             CancelAppointmentUseCase cancelAppointmentUseCase
@@ -32,7 +31,6 @@ public class DependencyInjectionConfig {
                 createAppointmentUseCase,
                 addMedicalDataUseCase,
                 completeAppointmentUseCase,
-                updateAppointmentUseCase,
                 getAppointmentUseCase,
                 listAppointmentsUseCase,
                 cancelAppointmentUseCase
@@ -65,18 +63,30 @@ public class DependencyInjectionConfig {
     }
 
     @Bean
-    public AddMedicalDataUseCase addMedicalDataUseCase(AppointmentGateway appointmentGateway) {
-        return new AddMedicalDataUseCaseImp(appointmentGateway);
+    public AddMedicalDataUseCase addMedicalDataUseCase(
+            AppointmentGateway appointmentGateway,
+            HistoryEventProducer historyEventProducer,
+            NotificationEventProducer notificationEventProducer
+    ) {
+        return new AddMedicalDataUseCaseImp(appointmentGateway, historyEventProducer, notificationEventProducer);
     }
 
     @Bean
-    public CompleteAppointmentUseCase completeAppointmentUseCase(AppointmentGateway appointmentGateway) {
-        return new CompleteAppointmentUseCaseImp(appointmentGateway);
+    public CompleteAppointmentUseCase completeAppointmentUseCase(
+            AppointmentGateway appointmentGateway,
+            HistoryEventProducer historyEventProducer,
+            NotificationEventProducer notificationEventProducer
+    ) {
+        return new CompleteAppointmentUseCaseImp(appointmentGateway, historyEventProducer, notificationEventProducer);
     }
 
     @Bean
-    public UpdateAppointmentUseCase updateAppointmentUseCase(AppointmentGateway appointmentGateway) {
-        return new UpdateAppointmentUseCaseImp(appointmentGateway);
+    public CancelAppointmentUseCase cancelAppointmentUseCase(
+            AppointmentGateway appointmentGateway,
+            HistoryEventProducer historyEventProducer,
+            NotificationEventProducer notificationEventProducer
+    ) {
+        return new CancelAppointmentUseCaseImp(appointmentGateway, historyEventProducer, notificationEventProducer);
     }
 
     @Bean
@@ -87,11 +97,6 @@ public class DependencyInjectionConfig {
     @Bean
     public ListAppointmentsUseCase listAppointmentsUseCase(AppointmentGateway appointmentGateway) {
         return new ListAppointmentsUseCaseImp(appointmentGateway);
-    }
-
-    @Bean
-    public CancelAppointmentUseCase cancelAppointmentUseCase(AppointmentGateway appointmentGateway) {
-        return new CancelAppointmentUseCaseImp(appointmentGateway);
     }
 
     // Producers

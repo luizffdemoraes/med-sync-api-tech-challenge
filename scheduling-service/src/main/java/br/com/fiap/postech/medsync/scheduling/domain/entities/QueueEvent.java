@@ -1,189 +1,79 @@
 package br.com.fiap.postech.medsync.scheduling.domain.entities;
 
 
-import br.com.fiap.postech.medsync.scheduling.domain.enums.HistoryEventType;
-import br.com.fiap.postech.medsync.scheduling.domain.enums.NotificationEventType;
-
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class QueueEvent {
-    private UUID id;
-    private UUID appointmentId;
-    private HistoryEventType historyEventType;
-    private NotificationEventType notificationEventType;
-    private String payload;
-    private LocalDateTime createdAt;
-    private String source;
-    private boolean processed;
+    private Long id; // ✅ MUDAR: UUID → Long para compatibilidade com BD
+    private String eventType; // ✅ "HISTORY" ou "NOTIFICATION"
+    private String queueName;
     private String routingKey;
+    private String messageBody; // ✅ JSON como string
+    private String status; // ✅ "PENDING", "SENT", "FAILED"
+    private Integer retryCount;
+    private LocalDateTime createdAt;
+    private LocalDateTime sentAt;
+    private String errorMessage;
 
-    // Construtor padrão
     public QueueEvent() {
-        this.id = UUID.randomUUID();
         this.createdAt = LocalDateTime.now();
-        this.processed = false;
+        this.status = "PENDING";
+        this.retryCount = 0;
     }
 
-    // Construtor para eventos de histórico
-    public QueueEvent(UUID appointmentId, HistoryEventType historyEventType, String payload, String source) {
+    // Construtor para eventos
+    public QueueEvent(String eventType, String queueName, String routingKey, String messageBody) {
         this();
-        this.appointmentId = appointmentId;
-        this.historyEventType = historyEventType;
-        this.payload = payload;
-        this.source = source;
-        this.routingKey = generateHistoryRoutingKey(historyEventType);
-    }
-
-    // Construtor para eventos de notificação
-    public QueueEvent(UUID appointmentId, NotificationEventType notificationEventType, String payload, String source) {
-        this();
-        this.appointmentId = appointmentId;
-        this.notificationEventType = notificationEventType;
-        this.payload = payload;
-        this.source = source;
-        this.routingKey = generateNotificationRoutingKey(notificationEventType);
+        this.eventType = eventType;
+        this.queueName = queueName;
+        this.routingKey = routingKey;
+        this.messageBody = messageBody;
     }
 
     // Getters e Setters
-    public UUID getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
+    public String getEventType() { return eventType; }
+    public void setEventType(String eventType) { this.eventType = eventType; }
 
-    public UUID getAppointmentId() {
-        return appointmentId;
-    }
+    public String getQueueName() { return queueName; }
+    public void setQueueName(String queueName) { this.queueName = queueName; }
 
-    public void setAppointmentId(UUID appointmentId) {
-        this.appointmentId = appointmentId;
-    }
+    public String getRoutingKey() { return routingKey; }
+    public void setRoutingKey(String routingKey) { this.routingKey = routingKey; }
 
-    public HistoryEventType getHistoryEventType() {
-        return historyEventType;
-    }
+    public String getMessageBody() { return messageBody; }
+    public void setMessageBody(String messageBody) { this.messageBody = messageBody; }
 
-    public void setHistoryEventType(HistoryEventType historyEventType) {
-        this.historyEventType = historyEventType;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public NotificationEventType getNotificationEventType() {
-        return notificationEventType;
-    }
+    public Integer getRetryCount() { return retryCount; }
+    public void setRetryCount(Integer retryCount) { this.retryCount = retryCount; }
 
-    public void setNotificationEventType(NotificationEventType notificationEventType) {
-        this.notificationEventType = notificationEventType;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public String getPayload() {
-        return payload;
-    }
+    public LocalDateTime getSentAt() { return sentAt; }
+    public void setSentAt(LocalDateTime sentAt) { this.sentAt = sentAt; }
 
-    public void setPayload(String payload) {
-        this.payload = payload;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public boolean isProcessed() {
-        return processed;
-    }
-
-    public void setProcessed(boolean processed) {
-        this.processed = processed;
-    }
-
-    public String getRoutingKey() {
-        return routingKey;
-    }
-
-    public void setRoutingKey(String routingKey) {
-        this.routingKey = routingKey;
-    }
+    public String getErrorMessage() { return errorMessage; }
+    public void setErrorMessage(String errorMessage) { this.errorMessage = errorMessage; }
 
     // Métodos de negócio
-    public void markAsProcessed() {
-        this.processed = true;
+    public void markAsSent() {
+        this.status = "SENT";
+        this.sentAt = LocalDateTime.now();
     }
 
-    public boolean isHistoryEvent() {
-        return this.historyEventType != null;
+    public void markAsFailed(String error) {
+        this.status = "FAILED";
+        this.errorMessage = error;
+        this.retryCount++;
     }
 
-    public boolean isNotificationEvent() {
-        return this.notificationEventType != null;
-    }
-
-    // Java
-    public String getEventType() {
-        if (historyEventType != null) return historyEventType.name();
-        if (notificationEventType != null) return notificationEventType.name();
-        return null;
-    }
-
-    public String getEventSubType() {
-        return routingKey;
-    }
-
-
-    // Geração de routing keys baseada nos exemplos
-    private String generateHistoryRoutingKey(HistoryEventType eventType) {
-        switch (eventType) {
-            case APPOINTMENT_CREATED:
-                return "appointment.created";
-            case APPOINTMENT_COMPLETED:
-                return "appointment.completed";
-            case MEDICAL_DATA_ADDED:
-                return "appointment.medical.updated";
-            case APPOINTMENT_CANCELLED:
-                return "appointment.cancelled";
-            case APPOINTMENT_UPDATED:
-                return "appointment.updated";
-            default:
-                return "appointment.general";
-        }
-    }
-
-    private String generateNotificationRoutingKey(NotificationEventType eventType) {
-        switch (eventType) {
-            case CREATED:
-                return "notification.appointment.created";
-            case UPDATED:
-                return "notification.appointment.updated";
-            case CANCELLED:
-                return "notification.appointment.cancelled";
-            default:
-                return "notification.appointment.general";
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "QueueEvent{" +
-                "id=" + id +
-                ", appointmentId=" + appointmentId +
-                ", historyEventType=" + historyEventType +
-                ", notificationEventType=" + notificationEventType +
-                ", routingKey=" + routingKey +
-                ", createdAt=" + createdAt +
-                ", processed=" + processed +
-                '}';
+    public boolean canRetry() {
+        return "FAILED".equals(this.status) && this.retryCount < 3;
     }
 }

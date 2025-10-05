@@ -4,6 +4,7 @@ import br.com.fiap.postech.medsync.scheduling.domain.entities.Appointment;
 import br.com.fiap.postech.medsync.scheduling.domain.enums.AppointmentStatus;
 import br.com.fiap.postech.medsync.scheduling.domain.enums.AppointmentType;
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,33 +15,16 @@ public class AppointmentEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Dados do Paciente
+    // ✅ CAMPOS QUE EXISTEM NO BANCO
     @Column(name = "patient_id", nullable = false)
     private Long patientId;
-
-    @Column(name = "patient_name", nullable = false)
-    private String patientName;
 
     @Column(name = "patient_email", nullable = false)
     private String patientEmail;
 
-    @Column(name = "patient_phone")
-    private String patientPhone;
-
-    // Dados do Médico
     @Column(name = "doctor_id", nullable = false)
     private Long doctorId;
 
-    @Column(name = "doctor_name", nullable = false)
-    private String doctorName;
-
-    @Column(name = "doctor_crm")
-    private String doctorCrm;
-
-    @Column(name = "doctor_specialty")
-    private String doctorSpecialty;
-
-    // Dados do Agendamento
     @Column(name = "appointment_date", nullable = false)
     private LocalDateTime appointmentDate;
 
@@ -59,7 +43,7 @@ public class AppointmentEntity {
     @Column(name = "cancellation_reason")
     private String cancellationReason;
 
-    // Dados Clínicos
+    // ✅ CAMPOS CLÍNICOS
     @Column(name = "chief_complaint")
     private String chiefComplaint;
 
@@ -75,29 +59,22 @@ public class AppointmentEntity {
     @Column(name = "updated_by")
     private Long updatedBy;
 
-    // Controle
-    @Column(name = "created_by")
-    private Long createdBy;
-
+    // ✅ CAMPOS DE CONTROLE
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+
     public AppointmentEntity() {
     }
 
-    public AppointmentEntity(Long patientId, Long id, String patientName, String patientEmail, String patientPhone, Long doctorId, String doctorName, String doctorCrm, String doctorSpecialty, LocalDateTime appointmentDate, String status, String type, Integer durationMinutes, String notes, String cancellationReason, String chiefComplaint, String diagnosis, String prescription, String clinicalNotes, Long updatedBy, Long createdBy, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public AppointmentEntity(Long patientId, Long id, String patientEmail, Long doctorId, LocalDateTime appointmentDate, String status, String type, Integer durationMinutes, String notes, String cancellationReason, String chiefComplaint, String diagnosis, String prescription, String clinicalNotes, Long updatedBy, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.patientId = patientId;
         this.id = id;
-        this.patientName = patientName;
         this.patientEmail = patientEmail;
-        this.patientPhone = patientPhone;
         this.doctorId = doctorId;
-        this.doctorName = doctorName;
-        this.doctorCrm = doctorCrm;
-        this.doctorSpecialty = doctorSpecialty;
         this.appointmentDate = appointmentDate;
         this.status = status;
         this.type = type;
@@ -109,27 +86,34 @@ public class AppointmentEntity {
         this.prescription = prescription;
         this.clinicalNotes = clinicalNotes;
         this.updatedBy = updatedBy;
-        this.createdBy = createdBy;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
+
     // Conversão: Domain -> Entity
     public static AppointmentEntity toEntity(Appointment appointment) {
         if (appointment == null) return null;
+
         AppointmentEntity entity = new AppointmentEntity();
         entity.setId(appointment.getId());
         entity.setPatientId(appointment.getPatientUserId());
+        entity.setPatientEmail(appointment.getPatientEmail()); // ✅ NOVO
         entity.setDoctorId(appointment.getDoctorUserId());
-        entity.setDoctorSpecialty(appointment.getMedicalSpecialtyId() != null ? appointment.getMedicalSpecialtyId().toString() : null);
         entity.setAppointmentDate(appointment.getAppointmentDate());
         entity.setStatus(appointment.getStatus() != null ? appointment.getStatus().name() : null);
         entity.setType(appointment.getType() != null ? appointment.getType().name() : null);
         entity.setDurationMinutes(appointment.getDurationMinutes());
         entity.setNotes(appointment.getNotes());
         entity.setCancellationReason(appointment.getCancellationReason());
-        entity.setClinicalNotes(appointment.getClinicalData());
-        // O campo 'urgent' pode ser salvo como uma nota ou flag, conforme necessidade
+
+        // ✅ CAMPOS CLÍNICOS
+        entity.setChiefComplaint(appointment.getChiefComplaint());
+        entity.setDiagnosis(appointment.getDiagnosis());
+        entity.setPrescription(appointment.getPrescription());
+        entity.setClinicalNotes(appointment.getClinicalNotes());
+        entity.setUpdatedBy(appointment.getUpdatedBy());
+
         return entity;
     }
 
@@ -138,16 +122,22 @@ public class AppointmentEntity {
         Appointment appointment = new Appointment();
         appointment.setId(this.getId());
         appointment.setPatientUserId(this.getPatientId());
+        appointment.setPatientEmail(this.getPatientEmail()); // ✅ NOVO
         appointment.setDoctorUserId(this.getDoctorId());
-        appointment.setMedicalSpecialtyId(this.getDoctorSpecialty() != null ? Long.valueOf(this.getDoctorSpecialty()) : null);
         appointment.setAppointmentDate(this.getAppointmentDate());
         appointment.setStatus(this.getStatus() != null ? AppointmentStatus.valueOf(this.getStatus()) : null);
         appointment.setType(this.getType() != null ? AppointmentType.valueOf(this.getType()) : null);
         appointment.setDurationMinutes(this.getDurationMinutes());
         appointment.setNotes(this.getNotes());
         appointment.setCancellationReason(this.getCancellationReason());
-        appointment.setClinicalData(this.getClinicalNotes());
-        // O campo 'urgent' não está presente na entidade, pode ser tratado conforme regra de negócio
+
+        // ✅ CAMPOS CLÍNICOS
+        appointment.setChiefComplaint(this.getChiefComplaint());
+        appointment.setDiagnosis(this.getDiagnosis());
+        appointment.setPrescription(this.getPrescription());
+        appointment.setClinicalNotes(this.getClinicalNotes());
+        appointment.setUpdatedBy(this.getUpdatedBy());
+
         return appointment;
     }
 
@@ -169,14 +159,6 @@ public class AppointmentEntity {
         this.patientId = patientId;
     }
 
-    public String getPatientName() {
-        return patientName;
-    }
-
-    public void setPatientName(String patientName) {
-        this.patientName = patientName;
-    }
-
     public String getPatientEmail() {
         return patientEmail;
     }
@@ -185,44 +167,12 @@ public class AppointmentEntity {
         this.patientEmail = patientEmail;
     }
 
-    public String getPatientPhone() {
-        return patientPhone;
-    }
-
-    public void setPatientPhone(String patientPhone) {
-        this.patientPhone = patientPhone;
-    }
-
     public Long getDoctorId() {
         return doctorId;
     }
 
     public void setDoctorId(Long doctorId) {
         this.doctorId = doctorId;
-    }
-
-    public String getDoctorCrm() {
-        return doctorCrm;
-    }
-
-    public void setDoctorCrm(String doctorCrm) {
-        this.doctorCrm = doctorCrm;
-    }
-
-    public String getDoctorName() {
-        return doctorName;
-    }
-
-    public void setDoctorName(String doctorName) {
-        this.doctorName = doctorName;
-    }
-
-    public String getDoctorSpecialty() {
-        return doctorSpecialty;
-    }
-
-    public void setDoctorSpecialty(String doctorSpecialty) {
-        this.doctorSpecialty = doctorSpecialty;
     }
 
     public LocalDateTime getAppointmentDate() {
@@ -311,14 +261,6 @@ public class AppointmentEntity {
 
     public void setUpdatedBy(Long updatedBy) {
         this.updatedBy = updatedBy;
-    }
-
-    public Long getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(Long createdBy) {
-        this.createdBy = createdBy;
     }
 
     public LocalDateTime getCreatedAt() {

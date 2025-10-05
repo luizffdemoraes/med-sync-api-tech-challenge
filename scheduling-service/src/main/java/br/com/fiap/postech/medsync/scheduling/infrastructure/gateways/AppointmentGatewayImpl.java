@@ -8,10 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class AppointmentGatewayImpl implements AppointmentGateway {
@@ -65,37 +62,5 @@ public class AppointmentGatewayImpl implements AppointmentGateway {
         }
 
         return entities.map(AppointmentEntity::toDomain);
-    }
-
-    @Override
-    public boolean existsByDoctorAndTime(Long doctorId, LocalDateTime startTime, LocalDateTime endTime) {
-        return appointmentRepository.existsByDoctorIdAndAppointmentDateBetweenAndStatusNot(
-                doctorId, startTime, endTime, "CANCELLED");
-    }
-
-    @Override
-    public boolean existsByPatientAndTime(Long patientId, LocalDateTime startTime, LocalDateTime endTime) {
-        return appointmentRepository.existsByPatientIdAndAppointmentDateBetweenAndStatusNot(
-                patientId, startTime, endTime, "CANCELLED");
-    }
-
-
-    @Override
-    public List<Appointment> findByPatientId(Long patientId) {
-        return appointmentRepository.findByPatientId(patientId).stream()
-                .map(AppointmentEntity::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Appointment> findByDoctorId(Long doctorId) {
-        return appointmentRepository.findByDoctorId(doctorId).stream()
-                .map(AppointmentEntity::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        appointmentRepository.deleteById(id);
     }
 }

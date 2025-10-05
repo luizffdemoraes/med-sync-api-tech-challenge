@@ -53,6 +53,7 @@ public class AppointmentDTO {
         AppointmentDTO dto = new AppointmentDTO();
         dto.setId(appointment.getId());
         dto.setPatientUserId(appointment.getPatientUserId());
+        dto.setPatientEmail(appointment.getPatientEmail());
         dto.setDoctorUserId(appointment.getDoctorUserId());
         dto.setAppointmentDate(appointment.getAppointmentDate());
         dto.setStatus(appointment.getStatus());
@@ -60,14 +61,13 @@ public class AppointmentDTO {
         dto.setDurationMinutes(appointment.getDurationMinutes());
         dto.setNotes(appointment.getNotes());
         dto.setCancellationReason(appointment.getCancellationReason());
-        // Campos clínicos simples: popular conforme seu uso no domínio
-        dto.setClinicalNotes(appointment.getClinicalData());
-        // Demais campos (caso ainda não sejam usados no domínio, ficam null)
-        dto.setChiefComplaint(null);
-        dto.setDiagnosis(null);
-        dto.setPrescription(null);
-        dto.setUpdatedBy(null);
-        dto.setPatientEmail(null); // Carregue o e-mail do paciente conforme seu fluxo/repositório
+
+        // ✅ CAMPOS CLÍNICOS CORRETOS
+        dto.setChiefComplaint(appointment.getChiefComplaint());
+        dto.setDiagnosis(appointment.getDiagnosis());
+        dto.setPrescription(appointment.getPrescription());
+        dto.setClinicalNotes(appointment.getClinicalNotes());
+        dto.setUpdatedBy(appointment.getUpdatedBy());
 
         return dto;
     }
