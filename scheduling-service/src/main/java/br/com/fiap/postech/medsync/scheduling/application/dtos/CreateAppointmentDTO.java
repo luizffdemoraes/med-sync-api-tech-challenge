@@ -39,6 +39,7 @@ public class CreateAppointmentDTO {
     public CreateAppointmentDTO(Long patientUserId, String patientEmail, Long doctorUserId, LocalDateTime appointmentDate,
                                 String type, Integer durationMinutes, String notes) {
         this.patientUserId = patientUserId;
+        this.patientEmail = patientEmail;
         this.doctorUserId = doctorUserId;
         this.appointmentDate = appointmentDate;
         this.type = type;

@@ -45,7 +45,7 @@ public class AppointmentController {
 
     @PatchMapping("/{id}/medical-data")
     public ResponseEntity<AppointmentDTO> addMedicalData(@PathVariable Long id,
-                                                         @RequestBody MedicalDataRequestDTO request) {
+                                                         @RequestBody @Valid MedicalDataRequestDTO request) {
         AppointmentDTO appointment = addMedicalDataUseCase.execute(id, request);
         return ResponseEntity.ok(appointment);
     }
@@ -59,7 +59,7 @@ public class AppointmentController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> cancelAppointment(@PathVariable Long id,
-                                                  @RequestBody CancelAppointmentDTO request) {
+                                                  @RequestBody @Valid CancelAppointmentDTO request) {
         cancelAppointmentUseCase.execute(id, request);
         return ResponseEntity.noContent().build();
     }

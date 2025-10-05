@@ -6,6 +6,7 @@ import br.com.fiap.postech.medsync.scheduling.infrastructure.exceptions.InvalidA
 import br.com.fiap.postech.medsync.scheduling.infrastructure.exceptions.SchedulingConflictException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -34,5 +35,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
         ErrorResponse error = new ErrorResponse("INVALID_INPUT", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        ErrorResponse error = new ErrorResponse("INVALID_REQUEST", ex.getMessage());
+        return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 }
