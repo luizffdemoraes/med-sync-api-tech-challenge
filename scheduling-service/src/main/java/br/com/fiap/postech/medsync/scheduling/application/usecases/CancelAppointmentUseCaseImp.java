@@ -32,6 +32,9 @@ public class CancelAppointmentUseCaseImp implements CancelAppointmentUseCase {
         // 2. Cancela a consulta com o motivo
         existingAppointment.cancel(request.getCancellationReason());
 
+        // 2.1. Atualiza quem realizou o cancelamento
+        existingAppointment.setUpdatedBy(request.getUpdatedBy());
+
         // 3. Atualiza a consulta no banco
         Appointment cancelledAppointment = appointmentGateway.update(existingAppointment);
 
