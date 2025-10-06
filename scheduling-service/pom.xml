@@ -78,7 +78,6 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-
         <!-- Testes -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
