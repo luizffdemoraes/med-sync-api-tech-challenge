@@ -1,5 +1,7 @@
 package br.com.fiap.postech.medsync.auth.infrastructure.config.security.custom;
 
+import br.com.fiap.postech.medsync.auth.infrastructure.persistence.entity.UserEntity;
+import br.com.fiap.postech.medsync.auth.infrastructure.persistence.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -33,15 +35,18 @@ public class CustomPasswordAuthenticationProvider implements AuthenticationProvi
 	private final UserDetailsService userDetailsService;
 	private final OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator;
 	private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 	private String username = "";
 	private String password = "";
 	private Set<String> authorizedScopes = new HashSet<>();
 
+
 	public CustomPasswordAuthenticationProvider(OAuth2AuthorizationService authorizationService,
-			OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator, 
-			UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-		
-		Assert.notNull(authorizationService, "authorizationService cannot be null");
+                                                OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator,
+                                                UserDetailsService userDetailsService,
+                                                PasswordEncoder passwordEncoder,
+                                                UserRepository userRepository) {
+        Assert.notNull(authorizationService, "authorizationService cannot be null");
 		Assert.notNull(tokenGenerator, "TokenGenerator cannot be null");
 		Assert.notNull(userDetailsService, "UserDetailsService cannot be null");
 		Assert.notNull(passwordEncoder, "PasswordEncoder cannot be null");
@@ -49,6 +54,7 @@ public class CustomPasswordAuthenticationProvider implements AuthenticationProvi
 		this.tokenGenerator = tokenGenerator;
 		this.userDetailsService = userDetailsService;
 		this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
 	}
 	
 	@Override
@@ -75,10 +81,14 @@ public class CustomPasswordAuthenticationProvider implements AuthenticationProvi
 				.map(scope -> scope.getAuthority())
 				.filter(scope -> registeredClient.getScopes().contains(scope))
 				.collect(Collectors.toSet());
+
+        UserEntity userEntity = userRepository.findByEmail(username)
+                .orElseThrow(() -> new OAuth2AuthenticationException("Credenciais inválidas"));
+        Long userId = userEntity.getId().longValue();
 		
 		//-----------Create a new Security Context Holder Context----------
 		OAuth2ClientAuthenticationToken oAuth2ClientAuthenticationToken = (OAuth2ClientAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-		CustomUserAuthorities customPasswordUser = new CustomUserAuthorities(username, user.getAuthorities());
+		CustomUserAuthorities customPasswordUser = new CustomUserAuthorities(username, userId, user.getAuthorities());
 		oAuth2ClientAuthenticationToken.setDetails(customPasswordUser);
 		
 		var newcontext = SecurityContextHolder.createEmptyContext();

@@ -6,6 +6,7 @@ import br.com.fiap.postech.medsync.history.application.usecases.GetMedicalRecord
 import br.com.fiap.postech.medsync.history.application.usecases.GetPatientHistoryUseCase;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -24,11 +25,13 @@ public class MedicalRecordQueryResolver {
         this.getAppointmentsByStatusUseCase = appointmentsUC;
     }
 
+    @PreAuthorize("hasAnyRole('DOCTOR','NURSE') or hasRole('PATIENT')")
     @QueryMapping
     public List<MedicalRecordResponse> getPatientHistory(@Argument("patientUserId") Long patientUserId) {
         return getPatientHistoryUseCase.execute(patientUserId);
     }
 
+    @PreAuthorize("hasAnyRole('DOCTOR','NURSE') or hasRole('PATIENT')")
     @QueryMapping
     public List<MedicalRecordResponse> getAppointmentsByStatus(
             @Argument("patientId") Long patientId,
@@ -36,6 +39,7 @@ public class MedicalRecordQueryResolver {
         return getAppointmentsByStatusUseCase.execute(patientId, status);
     }
 
+    @PreAuthorize("hasAnyRole('DOCTOR','NURSE') or hasRole('PATIENT')")
     @QueryMapping
     public MedicalRecordResponse getMedicalRecordByAppointmentId(@Argument("appointmentId") Long appointmentId) {
         return getMedicalRecordByAppointmentIdUseCase.execute(appointmentId);

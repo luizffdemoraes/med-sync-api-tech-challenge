@@ -4,6 +4,7 @@ package br.com.fiap.postech.medsync.auth.infrastructure.config.security;
 import br.com.fiap.postech.medsync.auth.infrastructure.config.security.custom.CustomPasswordAuthenticationConverter;
 import br.com.fiap.postech.medsync.auth.infrastructure.config.security.custom.CustomPasswordAuthenticationProvider;
 import br.com.fiap.postech.medsync.auth.infrastructure.config.security.custom.CustomUserAuthorities;
+import br.com.fiap.postech.medsync.auth.infrastructure.persistence.repository.UserRepository;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
@@ -60,10 +61,12 @@ public class AuthorizationServerConfig {
 
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
-    public AuthorizationServerConfig(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+    public AuthorizationServerConfig(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder, UserRepository userRepository) {
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
     }
 
 
@@ -92,7 +95,7 @@ public class AuthorizationServerConfig {
         // Registra provider para o grant personalizado
         http.authenticationProvider(
                 new CustomPasswordAuthenticationProvider(
-                        authorizationService(), tokenGenerator(), userDetailsService, this.passwordEncoder)
+                        authorizationService(), tokenGenerator(), userDetailsService, this.passwordEncoder, this.userRepository)
         );
 
         return http.build();
@@ -165,7 +168,8 @@ public class AuthorizationServerConfig {
                 // @formatter:off
                 context.getClaims()
                         .claim("authorities", authorities)
-                        .claim("username", user.getUsername());
+                        .claim("username", user.getUsername())
+                        .claim("user_id", user.getUserId());;
                 // @formatter:on
             }
         };
