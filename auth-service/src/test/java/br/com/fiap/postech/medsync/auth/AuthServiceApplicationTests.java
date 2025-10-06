@@ -1,4 +1,4 @@
-package br.com.fiap.postech.medsync.auth_service;
+package br.com.fiap.postech.medsync.auth;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

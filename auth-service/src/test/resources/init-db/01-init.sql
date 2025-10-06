@@ -5,13 +5,13 @@ CREATE SCHEMA IF NOT EXISTS auth;
 -- Schema: auth
 -- ======================
 
-CREATE TABLE auth.roles
+CREATE TABLE IF NOT EXISTS auth.roles
 (
     id   SERIAL PRIMARY KEY,
     authority VARCHAR(50) UNIQUE NOT NULL
 );
 
-CREATE TABLE auth.users
+CREATE TABLE IF NOT EXISTS auth.users
 (
     id               SERIAL PRIMARY KEY,
     name             VARCHAR(255)        NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE auth.users
     zip_code         VARCHAR(255)        NOT NULL
 );
 
-CREATE TABLE auth.user_role
+CREATE TABLE IF NOT EXISTS auth.user_role
 (
     user_id BIGINT NOT NULL,
     role_id BIGINT NOT NULL,

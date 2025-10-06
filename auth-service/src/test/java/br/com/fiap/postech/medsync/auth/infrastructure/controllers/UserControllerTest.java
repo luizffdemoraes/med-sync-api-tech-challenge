@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
@@ -32,6 +33,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
+@TestPropertySource(properties = {
+        "spring.sql.init.mode=always",
+        // opcional: banco isolado se algum bean for usar DataSource
+        "spring.datasource.url=jdbc:h2:mem:controllerTestDb;MODE=PostgreSQL"
+})
 public class UserControllerTest {
 
     @Autowired
