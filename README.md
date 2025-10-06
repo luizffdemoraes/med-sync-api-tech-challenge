@@ -27,7 +27,7 @@
 O **MedSync Healthcare System** é uma API modular e containerizada que oferece:
 * Cadastro de pacientes, medicos, enfermeiros, geração de token e autenticação .
 * Agendamento de consultas médicas.
-* Envio de notificações automáticas a pacientes.
+* Envio de notificações automáticas a pacientes por emal.
 * Exposição do histórico clínico via **GraphQL**.
 * Comunicação assíncrona entre serviços via **RabbitMQ**.
 
@@ -64,37 +64,47 @@ O sistema contempla perfis distintos (**DOCTOR, NURSE, PATIENT**) com permissõe
 
 ### 📨 Notification Service
 
-| Operação                    | Descrição                                    | Acesso  |
-| --------------------------- | -------------------------------------------- | ------- |
-| Recebe eventos via RabbitMQ | Processa mensagens de agendamento/editadas   | Interno |
+| Operação                    | Descrição                                          | Acesso  |
+| --------------------------- |----------------------------------------------------| ------- |
+| Recebe eventos via RabbitMQ | Processa mensagens e envia email para os pacientes | Interno |
+
+Obs.: Requer o parametro MAILTRAP_API_TOKEN, contendo o token de acesso do Mailtrap para envio real de emails.
 
 ---
 
 ### 📖 History Service (GraphQL)
 
-| Operação (GraphQL)          | Descrição                               | Acesso               |
-| --------------------------- | --------------------------------------- |----------------------|
-| `patientHistory(patientId)` | Retorna histórico completo do paciente  | DOCTOR/NURSE/PATIENT |
-| `appointments(patientId)`   | Retorna consultas agendadas ou passadas | DOCTOR/NURSE/PATIENT |
+
+| Operação (GraphQL)                                         | Descrição                                        | Acesso               |
+|------------------------------------------------------------|--------------------------------------------------|----------------------|
+| `getPatientHistory(patientUserId: ID!)`                    | Retorna histórico completo do paciente           | DOCTOR/NURSE/PATIENT |
+| `getAppointmentsByStatus(patientId: ID!, status: String!)` | Retorna consultas filtradas por status           | DOCTOR/NURSE/PATIENT |
+| `getMedicalRecordByAppointmentId(appointmentId: ID!)`      | Retorna prontuário específico por ID da consulta | DOCTOR/NURSE/PATIENT |
+
+**Observações:**
+- `getPatientHistory` utiliza `patientUserId` como parâmetro de identificação
+- `getAppointmentsByStatus` requer o `patientId` e `status` como parâmetros obrigatórios
+- Todas as operações retornam tipos `MedicalRecord` ou lista deles.
+
 
 # 🔄 Fluxo de Mensagens RabbitMQ
 
-| Evento | Routing Key | Queue Destino | Ação no History Service |
-|--------|-------------|---------------|------------------------|
-| **APPOINTMENT_CREATED** | `appointment.created` | `history.service.queue` | Cria registro básico da consulta |
-| **APPOINTMENT_COMPLETED** | `appointment.completed` | `history.service.queue` | Atualiza status para "COMPLETED" |
-| **MEDICAL_DATA_ADDED** | `appointment.medical.updated` | `history.service.queue` | Adiciona diagnósticos e prescrições |
-| **APPOINTMENT_CANCELLED** | `appointment.cancelled` | `history.service.queue` | Atualiza status para "CANCELLED" |
-| **APPOINTMENT_UPDATED** | `appointment.updated` | `history.service.queue` | Atualiza data/hora da consulta |
+| Evento                    | Routing Key                   | Queue Destino           | Ação no History Service             |
+|---------------------------|-------------------------------|-------------------------|-------------------------------------|
+| **APPOINTMENT_CREATED**   | `appointment.created`         | `history.service.queue` | Cria registro básico da consulta    |
+| **APPOINTMENT_COMPLETED** | `appointment.completed`       | `history.service.queue` | Atualiza status para "COMPLETED"    |
+| **MEDICAL_DATA_ADDED**    | `appointment.medical.updated` | `history.service.queue` | Adiciona diagnósticos e prescrições |
+| **APPOINTMENT_CANCELLED** | `appointment.cancelled`       | `history.service.queue` | Atualiza status para "CANCELLED"    |
+| **APPOINTMENT_UPDATED**   | `appointment.updated`         | `history.service.queue` | Atualiza data/hora da consulta      |
 
 # 🛡️ Regras de Segurança
 
-| Validação | Descrição | Implementação |
-|-----------|-----------|---------------|
-| **Autenticação JWT** | Token válido obrigatório em todas as requisições | Spring Security OAuth2 |
-| **Validação de Role** | Apenas usuários com role `PATIENT` podem acessar | `@PreAuthorize("hasRole('PATIENT')")` |
-| **Propriedade dos Dados** | Paciente só pode acessar seu próprio histórico | Validação de `patientId` vs ID do token |
-| **Idempotência** | Mensagens duplicadas não criam registros duplicados | Verificação de `appointment_id` existente |
+| Validação                 | Descrição                                                      | Implementação                             |
+|---------------------------|----------------------------------------------------------------|-------------------------------------------|
+| **Autenticação JWT**      | Token válido obrigatório em todas as requisições               | Spring Security OAuth2                    |
+| **Validação de Role**     | Apenas usuários com role `PATIENT` podem acessar               | `@PreAuthorize("hasRole('PATIENT')")`     |
+| **Propriedade dos Dados** | Paciente só pode acessar seu próprio histórico                 | Validação de `patientId` vs ID do token   |
+| **Idempotência**          | Mensagens duplicadas não criam registros duplicados            | Verificação de `appointment_id` existente |
 
 ---
 
