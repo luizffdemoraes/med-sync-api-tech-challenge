@@ -39,18 +39,25 @@ O sistema contempla perfis distintos (**DOCTOR, NURSE, PATIENT**) com permissõe
 
 ### 🔐 Auth Service
 
+| Operação                         | Descrição                               | Acesso                |
+|----------------------------------|-----------------------------------------|-----------------------|
+| `POST   /v1/users`               | Cria novo registro de usuário           | DOCTOR/NURSE/PATIENT  |
+| `GET    /v1/users/{id}`          | Obtém detalhes de um usuário específico | DOCTOR/NURSE/PATIENT  |
+| `PUT    /v1/users/{id}`          | Atualiza informações do usuário         | DOCTOR/NURSE/PATIENT  |
+| `PATCH  /v1/users/{id}/password` | Altera senha do usuário                 | DOCTOR/NURSE/PATIENT  |
+| `POST   /v1/oauth2/token`        | Gera token de autenticação              | DOCTOR/NURSE/PATIENT  |
 
 
 ### 📅 Scheduling Service
 
 | Operação                                | Descrição                                                                                        | Acesso       |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------ |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------ |--------------|
 | `POST /appointments`                    | Cria uma nova consulta médica                                                                    | DOCTOR/NURSE |
 | `GET /appointments/{id}`                | Retorna os detalhes de uma consulta específica                                                   | DOCTOR/NURSE |
 | `GET /appointments`                     | Lista consultas com filtros opcionais (`patientId`, `doctorId`, `status`)                        | DOCTOR/NURSE |
-| `DELETE /appointments/{id}`             | Cancela uma consulta existente                                                                   | DOCTOR/NURSE |
-| `PATCH /appointments/{id}/complete`     | Marca uma consulta como **COMPLETED**                                                            | DOCTOR/NURSE |
-| `PATCH /appointments/{id}/medical-data` | Adiciona dados médicos à consulta (ex.: prescrições, observações)                                | DOCTOR/NURSE |
+| `DELETE /appointments/{id}`             | Cancela uma consulta existente                                                                   | DOCTOR       |
+| `PATCH /appointments/{id}/complete`     | Marca uma consulta como **COMPLETED**                                                            | DOCTOR       |
+| `PATCH /appointments/{id}/medical-data` | Adiciona dados médicos à consulta (ex.: prescrições, observações)                                | DOCTOR       |
 | `Posta mensagens em filas`              | Envia eventos para histórico e notificação (`HistoryEventProducer`, `NotificationEventProducer`) | Interno      |
 
 ---
@@ -65,10 +72,10 @@ O sistema contempla perfis distintos (**DOCTOR, NURSE, PATIENT**) com permissõe
 
 ### 📖 History Service (GraphQL)
 
-| Operação (GraphQL)          | Descrição                               | Acesso  |
-| --------------------------- | --------------------------------------- | ------- |
-| `patientHistory(patientId)` | Retorna histórico completo do paciente  | PATIENT |
-| `appointments(patientId)`   | Retorna consultas agendadas ou passadas | PATIENT |
+| Operação (GraphQL)          | Descrição                               | Acesso               |
+| --------------------------- | --------------------------------------- |----------------------|
+| `patientHistory(patientId)` | Retorna histórico completo do paciente  | DOCTOR/NURSE/PATIENT |
+| `appointments(patientId)`   | Retorna consultas agendadas ou passadas | DOCTOR/NURSE/PATIENT |
 
 # 🔄 Fluxo de Mensagens RabbitMQ
 
