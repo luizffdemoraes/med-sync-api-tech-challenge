@@ -22,9 +22,16 @@ public class CreateUserUseCaseImp implements CreateUserUseCase {
         if (userGateway.existsUserByEmail(user.getEmail())) {
             throw new BusinessException("Email already registered");
         }
-        Role role = roleGateway.findByAuthority(user.getRoles().iterator().next().getAuthority())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid role: " + user.getRoles()));
+        // Sempre pega o authority do "request"
+        String authority = user.getRoles().iterator().next().getAuthority();
+        Role role = roleGateway.findByAuthority(authority)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid role: " + authority));
 
+        // Atualize o usuário para portar apenas o papel real do banco
+        user.getRoles().clear();
+        user.addRole(role);
+
+        // Aqui você tem certeza que o usuário só referencia papéis já cadastrados e com id correto!
         return userGateway.saveUser(user);
     }
 }

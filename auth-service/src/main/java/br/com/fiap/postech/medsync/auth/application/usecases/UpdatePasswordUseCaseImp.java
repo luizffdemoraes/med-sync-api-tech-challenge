@@ -13,7 +13,7 @@ public class UpdatePasswordUseCaseImp implements UpdatePasswordUseCase{
 
     @Override
     public void execute(Integer id, String newPassword) {
-        this.userGateway.validateSelfOrAdmin(id);
+        this.userGateway.validateSelf(id);
         this.userGateway.updateUserPassword(id, newPassword);
     }
 }

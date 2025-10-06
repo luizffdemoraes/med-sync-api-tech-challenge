@@ -14,7 +14,7 @@ public class UpdateUserUseCaseImp implements UpdateUserUseCase{
 
     @Override
     public User execute(Integer id, User user) {
-        this.userGateway.validateSelfOrAdmin(id);
+        this.userGateway.validateSelf(id);
         return this.userGateway.updateUser(id, user);
     }
 }

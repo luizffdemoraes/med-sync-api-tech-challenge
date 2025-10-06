@@ -9,7 +9,7 @@ import java.util.Objects;
 
 
 @Entity
-@Table(name = "roles")
+@Table(name = "roles", schema = "auth")
 public class RoleEntity implements GrantedAuthority {
 
     @Id

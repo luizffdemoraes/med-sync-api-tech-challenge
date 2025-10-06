@@ -10,6 +10,6 @@ public interface UserGateway {
     User updateUser(Integer id, User user);
     void updateUserPassword(Integer id, String newPassword);
     User authenticated();
-    void validateSelfOrAdmin(Integer userId);
     User findUserOrThrow(Integer id);
+    void validateSelf(Integer userId);
 }

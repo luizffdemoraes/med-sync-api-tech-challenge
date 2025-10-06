@@ -5,7 +5,9 @@ import br.com.fiap.postech.medsync.auth.domain.entities.User;
 import br.com.fiap.postech.medsync.auth.domain.gateways.UserGateway;
 import br.com.fiap.postech.medsync.auth.infrastructure.config.mapper.UserMapper;
 import br.com.fiap.postech.medsync.auth.infrastructure.exceptions.BusinessException;
+import br.com.fiap.postech.medsync.auth.infrastructure.persistence.entity.RoleEntity;
 import br.com.fiap.postech.medsync.auth.infrastructure.persistence.entity.UserEntity;
+import br.com.fiap.postech.medsync.auth.infrastructure.persistence.repository.RoleRepository;
 import br.com.fiap.postech.medsync.auth.infrastructure.persistence.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,16 +21,27 @@ public class UserGatewayImpl implements UserGateway {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
 
-    public UserGatewayImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserGatewayImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
     }
 
     @Override
     public User saveUser(User user) {
         UserEntity userEntity = UserMapper.fromDomain(user);
         userEntity.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // Limpe os roles do mapeamento
+        userEntity.getRoleEntities().clear();
+        // Adicione apenas roleEntities gerenciados pelo JPA
+        user.getRoles().forEach(role -> {
+            RoleEntity managedRole = roleRepository.getReferenceById(role.getId());
+            userEntity.addRole(managedRole);
+        });
+
         UserEntity saved = this.userRepository.save(userEntity);
         return UserMapper.toDomain(saved);
     }
@@ -78,13 +91,6 @@ public class UserGatewayImpl implements UserGateway {
             return UserMapper.toDomain(userEntity);
         } catch (Exception e) {
             throw new UsernameNotFoundException("Invalid user");
-        }
-    }
-
-    public void validateSelfOrAdmin(Integer userId) {
-        User me = authenticated();
-        if (!me.hasRole("ROLE_ADMIN") && !me.getId().equals(userId)) {
-            throw new BusinessException("Access denied");
         }
     }
 

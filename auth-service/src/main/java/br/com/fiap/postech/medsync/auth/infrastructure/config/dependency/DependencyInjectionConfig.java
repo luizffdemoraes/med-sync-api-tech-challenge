@@ -65,8 +65,9 @@ public class DependencyInjectionConfig {
 
     @Bean
     public UserGateway userGateway(UserRepository repository,
-                                   PasswordEncoder passwordEncoder) {
-        return new UserGatewayImpl(repository, passwordEncoder);
+                                   PasswordEncoder passwordEncoder,
+                                   RoleRepository roleRepository) {
+        return new UserGatewayImpl(repository, passwordEncoder, roleRepository);
     }
 
     @Bean

@@ -1,8 +1,9 @@
 package br.com.fiap.postech.medsync.auth.infrastructure.config.security;
 
-import br.com.fiap.postech.restaurantsync.infrastructure.config.security.custom.CustomPasswordAuthenticationConverter;
-import br.com.fiap.postech.restaurantsync.infrastructure.config.security.custom.CustomPasswordAuthenticationProvider;
-import br.com.fiap.postech.restaurantsync.infrastructure.config.security.custom.CustomUserAuthorities;
+
+import br.com.fiap.postech.medsync.auth.infrastructure.config.security.custom.CustomPasswordAuthenticationConverter;
+import br.com.fiap.postech.medsync.auth.infrastructure.config.security.custom.CustomPasswordAuthenticationProvider;
+import br.com.fiap.postech.medsync.auth.infrastructure.config.security.custom.CustomUserAuthorities;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;

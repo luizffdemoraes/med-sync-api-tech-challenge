@@ -11,13 +11,18 @@ import br.com.fiap.postech.medsync.auth.infrastructure.persistence.entity.UserEn
 public class UserMapper {
 
     public static User toDomain(UserRequest request) {
-        return new User(
+
+        User user = new User(
                 request.name(),
                 request.email(),
                 request.login(),
                 request.password(),
-                AddressMapper.toDomain(request.address())
-        );
+                AddressMapper.toDomain(request.address()));
+
+        user.addRole(new Role(null, request.role()));
+
+        return user;
+
     }
 
     public static User toDomain(UserEntity entity) {

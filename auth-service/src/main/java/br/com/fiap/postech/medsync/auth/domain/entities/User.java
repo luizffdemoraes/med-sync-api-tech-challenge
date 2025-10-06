@@ -66,15 +66,9 @@ public class User {
 
     public void setAddress(Address address) { this.address = address; }
 
-    public String getRole() {
-        return roles.stream()
-                .findFirst()
-                .map(Role::getAuthority)
-                .orElse(null);
-    }
+    public Set<Role> getRoles() { return roles; }
 
-    public void setRole(Role role) {
-        this.roles.clear();
+    public void addRole(Role role) {
         this.roles.add(role);
     }
 
