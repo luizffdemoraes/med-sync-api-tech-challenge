@@ -56,6 +56,9 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      CLIENT_ID: ${CLIENT_ID:-myclientid}
+      CLIENT_SECRET: ${CLIENT_SECRET:-myclientsecret}
+      JWT_DURATION: ${JWT_DURATION:-86400}
     depends_on:
       postgres:
         condition: service_healthy
