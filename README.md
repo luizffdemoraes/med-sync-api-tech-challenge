@@ -452,6 +452,10 @@ target/site/jacoco/index.html
 
 ### Exemplo da cobertura gerada:
 
+### auth-service
+
+![auth-coverage](images/auth-coverage.png)
+
 ### scheduling-service
 
 ![scheduling-coverage](images/scheduling-coverage.png)
