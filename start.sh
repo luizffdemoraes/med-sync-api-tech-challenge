@@ -2,6 +2,7 @@
 echo "Iniciando MedSync Healthcare System..."
 docker-compose up --build -d
 echo "Sistema iniciado! Acessos:"
+echo "Auth: http://localhost:8079"
 echo "Scheduling: http://localhost:8080"
 echo "History: http://localhost:8081/graphql"
 echo "Notification: http://localhost:8082"

@@ -126,6 +126,7 @@ Obs.: Requer o parametro MAILTRAP_API_TOKEN, contendo o token de acesso do Mailt
 
 ```
 medsync-healthcare-system/
+├── auth-service/           # Microsserviço de autenticação (Java + Spring Boot)
 ├── scheduling-service/     # Microsserviço de agendamento (Java + Spring Boot)
 ├── notification-service/   # Microsserviço de notificações (Java + Spring Boot)
 ├── history-service/        # Microsserviço de histórico (GraphQL + Java)
@@ -138,6 +139,114 @@ medsync-healthcare-system/
 ### 🧹 Clean Architecture
 Cada microsserviço segue os princípios da Clean Architecture, garantindo separação de concerns e testabilidade.
 
+#### auth-service
+```
+auth-service/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── br/com/fiap/postech/medsync/auth/
+│   │   │       │
+│   │   │       ├── application/
+│   │   │       │   ├── dtos/
+│   │   │       │   │   ├── requests/
+│   │   │       │   │   │   ├── AddressRequest.java
+│   │   │       │   │   │   ├── PasswordRequest.java
+│   │   │       │   │   │   └── UserRequest.java
+│   │   │       │   │   │
+│   │   │       │   │   └── responses/
+│   │   │       │   │       ├── AddressResponse.java
+│   │   │       │   │       ├── TokenResponse.java
+│   │   │       │   │       └── UserResponse.java
+│   │   │       │   │
+│   │   │       │   └── usecases/
+│   │   │       │       ├── CreateUserUseCase.java
+│   │   │       │       ├── CreateUserUseCaseImp.java
+│   │   │       │       ├── FindUserByIdUseCase.java
+│   │   │       │       ├── FindUserByIdUseCaseImp.java
+│   │   │       │       ├── UpdatePasswordUseCase.java
+│   │   │       │       ├── UpdatePasswordUseCaseImp.java
+│   │   │       │       ├── UpdateUserUseCase.java
+│   │   │       │       └── UpdateUserUseCaseImp.java
+│   │   │       │
+│   │   │       ├── domain/
+│   │   │       │   ├── entities/
+│   │   │       │   │   ├── Address.java
+│   │   │       │   │   ├── Role.java
+│   │   │       │   │   └── User.java
+│   │   │       │   │
+│   │   │       │   ├── enums/
+│   │   │       │   │   ├── RoleType.java
+│   │   │       │   │   └── UserStatus.java
+│   │   │       │   │
+│   │   │       │   └── gateways/
+│   │   │       │       ├── RoleGateway.java
+│   │   │       │       └── UserGateway.java
+│   │   │       │
+│   │   │       └── infrastructure/
+│   │   │           ├── config/
+│   │   │           │   ├── dependency/
+│   │   │           │   │   └── DependencyInjectionConfig.java
+│   │   │           │   │
+│   │   │           │   ├── mapper/
+│   │   │           │   │   ├── AddressMapper.java
+│   │   │           │   │   └── UserMapper.java
+│   │   │           │   │
+│   │   │           │   └── security/
+│   │   │           │       ├── AuthorizationServerConfig.java
+│   │   │           │       ├── PasswordConfig.java
+│   │   │           │       ├── ResourceServerConfig.java
+│   │   │           │       │
+│   │   │           │       └── custom/
+│   │   │           │           ├── CustomPasswordAuthenticationConverter.java
+│   │   │           │           ├── CustomPasswordAuthenticationProvider.java
+│   │   │           │           ├── CustomPasswordAuthenticationToken.java
+│   │   │           │           └── CustomUserAuthorities.java
+│   │   │           │
+│   │   │           ├── controllers/
+│   │   │           │   └── UserController.java
+│   │   │           │
+│   │   │           ├── exceptions/
+│   │   │           │   ├── handler/
+│   │   │           │   │   └── GlobalExceptionHandler.java
+│   │   │           │   │
+│   │   │           │   ├── BusinessException.java
+│   │   │           │   ├── InvalidCredentialsException.java
+│   │   │           │   ├── UserNotFoundException.java
+│   │   │           │   └── ValidationException.java
+│   │   │           │
+│   │   │           ├── gateways/
+│   │   │           │   ├── RoleGatewayImpl.java
+│   │   │           │   └── UserGatewayImpl.java
+│   │   │           │
+│   │   │           ├── messaging/
+│   │   │           │   └── UserEventProducer.java
+│   │   │           │
+│   │   │           └── persistence/
+│   │   │               ├── entity/
+│   │   │               │   ├── AddressEntity.java
+│   │   │               │   ├── RoleEntity.java
+│   │   │               │   └── UserEntity.java
+│   │   │               │
+│   │   │               └── repository/
+│   │   │                   ├── RoleRepository.java
+│   │   │                   └── UserRepository.java
+│   │   │
+│   │   └── resources/
+│   │       ├── application.properties
+│   │       ├── application-local.properties
+│   │       ├── static/
+│   │       └── templates/
+│   │
+│   └── test/
+│       └── java/... (estrutura espelhada)
+│
+├── init-db/
+│   └── 01-init.sql
+│
+├── Dockerfile
+└── pom.xml
+```
 
 #### scheduling-service
 ```
@@ -433,15 +542,6 @@ history-service/
    * History (GraphQL): [http://localhost:8081/graphql](http://localhost:8081/graphql)
    * Notification: [http://localhost:8082](http://localhost:8082)
    * RabbitMQ Console: [http://localhost:15672](http://localhost:15672)
-
----
-
-## 📖 Documentação da API
-
-A documentação de endpoints estará disponível via Swagger UI nos serviços REST:
-
-* [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
-* [http://localhost:8082/swagger-ui/index.html](http://localhost:8082/swagger-ui/index.html)
 
 ---
 
