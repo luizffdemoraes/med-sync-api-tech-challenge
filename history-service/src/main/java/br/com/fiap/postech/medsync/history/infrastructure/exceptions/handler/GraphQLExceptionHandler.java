@@ -2,6 +2,7 @@ package br.com.fiap.postech.medsync.history.infrastructure.exceptions.handler;
 
 import br.com.fiap.postech.medsync.history.infrastructure.exceptions.InvalidPatientIdException;
 import br.com.fiap.postech.medsync.history.infrastructure.exceptions.MedicalRecordNotFoundException;
+import br.com.fiap.postech.medsync.history.infrastructure.exceptions.PatientAccessDeniedException;
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
 import graphql.schema.DataFetchingEnvironment;
@@ -24,6 +25,13 @@ public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter
         } else if (ex instanceof MedicalRecordNotFoundException) {
             return GraphqlErrorBuilder.newError()
                     .errorType(ErrorType.NOT_FOUND)
+                    .message(ex.getMessage())
+                    .path(env.getExecutionStepInfo().getPath())
+                    .location(env.getField().getSourceLocation())
+                    .build();
+        } else if (ex instanceof PatientAccessDeniedException) {
+            return GraphqlErrorBuilder.newError()
+                    .errorType(ErrorType.FORBIDDEN)
                     .message(ex.getMessage())
                     .path(env.getExecutionStepInfo().getPath())
                     .location(env.getField().getSourceLocation())
