@@ -8,8 +8,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -30,11 +32,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
-                        // GraphQL deve exigir JWT
                         .requestMatchers("/graphql").authenticated()
-                        // Actuator/health pode continuar aberto se desejado; caso contrário, remova a linha abaixo
                         .requestMatchers("/actuator/health").permitAll()
-                        .anyRequest().authenticated() // exige JWT para qualquer endpoint
+                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
@@ -42,6 +42,9 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // ============================================================
+    //  2. Converter de autoridades a partir do JWT
+    // ============================================================
     private Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {
@@ -57,9 +60,17 @@ public class SecurityConfig {
         return converter;
     }
 
+    // ============================================================
+    //  3. JwtDecoder via JWKS
+    // ============================================================
     @Bean
     public JwtDecoder jwtDecoder() {
-        // Ajuste o issuer/jwks conforme o Authorization Server
-        return NimbusJwtDecoder.withJwkSetUri("http://medsync-auth:8079/oauth2/jwks").build();
+        NimbusJwtDecoder decoder = NimbusJwtDecoder
+                .withJwkSetUri("http://medsync-auth:8079/oauth2/jwks") // hostname interno do Docker
+                .jwsAlgorithm(SignatureAlgorithm.RS256)
+                .build();
+
+        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer("http://localhost:8079"));
+        return decoder;
     }
 }

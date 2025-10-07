@@ -33,10 +33,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(HttpMethod.POST, "/appointments").hasAnyAuthority("ROLE_NURSE", "ROLE_DOCTOR")
-                        .requestMatchers(HttpMethod.GET, "/appointments/**").hasAnyAuthority("ROLE_NURSE", "ROLE_DOCTOR")
-                        .requestMatchers(HttpMethod.DELETE, "/appointments/**").hasAuthority("ROLE_DOCTOR")
-                        .requestMatchers(HttpMethod.PATCH, "/appointments/**/complete").hasAuthority("ROLE_DOCTOR")
-                        .requestMatchers(HttpMethod.PATCH, "/appointments/**/medical-data").hasAuthority("ROLE_DOCTOR")
+                        .requestMatchers(HttpMethod.GET, "/appointments/{id}").hasAnyAuthority("ROLE_NURSE", "ROLE_DOCTOR")
+                        .requestMatchers(HttpMethod.DELETE, "/appointments/{id}").hasAuthority("ROLE_DOCTOR")
+                        .requestMatchers(HttpMethod.PATCH, "/appointments/{id}/complete").hasAuthority("ROLE_DOCTOR")
+                        .requestMatchers(HttpMethod.PATCH, "/appointments/{id}/medical-data").hasAuthority("ROLE_DOCTOR")
                         .requestMatchers("/actuator/health").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -66,7 +66,7 @@ public class SecurityConfig {
     }
 
     // ============================================================
-    //  3. JwtDecoder via JWKS (sem PEM local)
+    //  3. JwtDecoder via JWKS
     // ============================================================
     @Bean
     public JwtDecoder jwtDecoder() {
@@ -75,7 +75,7 @@ public class SecurityConfig {
                 .jwsAlgorithm(SignatureAlgorithm.RS256)
                 .build();
 
-        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer("http://medsync-auth:8079"));
+        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer("http://localhost:8079"));
         return decoder;
     }
 }
