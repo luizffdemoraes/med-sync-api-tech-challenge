@@ -1,0 +1,44 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: scheduling-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/medsync
+    username: postgres
+    password: password
+    hikari:
+      connection-timeout: 60000
+      maximum-pool-size: 5
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: password
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://medsync-auth:8079/oauth2/jwks
+
+app:
+  rabbitmq:
+    queue:
+      history: history-queue
+      notification: notification-queue
+
+logging:
+  level:
+    org:
+      springframework:
+        security: TRACE
+        security.oauth2: TRACE
+        web: DEBUG
