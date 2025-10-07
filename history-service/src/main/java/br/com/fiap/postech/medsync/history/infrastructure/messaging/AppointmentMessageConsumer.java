@@ -38,33 +38,59 @@ public class AppointmentMessageConsumer {
         String messageBody = null;
         try {
             messageBody = new String(message.getBody(), StandardCharsets.UTF_8);
+
+            logger.debug("Mensagem recebida: {}", messageBody);
+
+            //  Ignora completamente o __TypeId__
             AppointmentMessageDTO messageDTO = objectMapper.readValue(messageBody, AppointmentMessageDTO.class);
 
             // Validação básica do DTO
-            if (messageDTO.getEventType() == null || messageDTO.getAppointmentId() == null) {
-                logger.error("Mensagem inválida: eventType ou appointmentId está nulo. Mensagem: {}", messageBody);
-                throw new AmqpRejectAndDontRequeueException("Mensagem inválida: campos obrigatórios nulos");
+            if (messageDTO.getEventType() == null) {
+                logger.error("Mensagem inválida: eventType está nulo. Mensagem: {}", messageBody);
+                throw new AmqpRejectAndDontRequeueException("Mensagem inválida: eventType nulo");
             }
 
             String eventType = messageDTO.getEventType();
             Long appointmentId = messageDTO.getAppointmentId();
 
+            logger.info("Processando evento: {} para appointment: {}", eventType, appointmentId);
+
             switch (eventType) {
                 case "APPOINTMENT_CREATED" -> {
-                    logger.info("Processing APPOINTMENT_CREATED for appointment: {}", appointmentId);
-                    createMedicalRecordUseCase.execute(messageDTO.toAppointmentCreatedEvent());
+                    AppointmentCreatedEvent event = messageDTO.toAppointmentCreatedEvent();
+                    if (event != null && event.getAppointment() != null) {
+                        createMedicalRecordUseCase.execute(event);
+                    } else {
+                        logger.error("Dados inválidos para APPOINTMENT_CREATED. Mensagem: {}", messageBody);
+                        throw new AmqpRejectAndDontRequeueException("Dados inválidos para APPOINTMENT_CREATED");
+                    }
                 }
                 case "APPOINTMENT_COMPLETED" -> {
-                    logger.info("Processing APPOINTMENT_COMPLETED for appointment: {}", appointmentId);
-                    updateAppointmentStatusUseCase.execute(messageDTO.toAppointmentCompletedEvent());
+                    AppointmentCompletedEvent event = messageDTO.toAppointmentCompletedEvent();
+                    if (event != null && event.getAppointment() != null) {
+                        updateAppointmentStatusUseCase.execute(event);
+                    } else {
+                        logger.error("Dados inválidos para APPOINTMENT_COMPLETED. Mensagem: {}", messageBody);
+                        throw new AmqpRejectAndDontRequeueException("Dados inválidos para APPOINTMENT_COMPLETED");
+                    }
                 }
                 case "MEDICAL_DATA_ADDED" -> {
-                    logger.info("Processing MEDICAL_DATA_ADDED for appointment: {}", appointmentId);
-                    addMedicalDataUseCase.execute(messageDTO.toMedicalDataAddedEvent());
+                    MedicalDataAddedEvent event = messageDTO.toMedicalDataAddedEvent();
+                    if (event != null && event.getClinicalData() != null) {
+                        addMedicalDataUseCase.execute(event);
+                    } else {
+                        logger.error("Dados inválidos para MEDICAL_DATA_ADDED. Mensagem: {}", messageBody);
+                        throw new AmqpRejectAndDontRequeueException("Dados inválidos para MEDICAL_DATA_ADDED");
+                    }
                 }
                 case "APPOINTMENT_CANCELLED" -> {
-                    logger.info("Processing APPOINTMENT_CANCELLED for appointment: {}", appointmentId);
-                    updateAppointmentStatusUseCase.execute(messageDTO.toAppointmentCancelledEvent());
+                    AppointmentCancelledEvent event = messageDTO.toAppointmentCancelledEvent();
+                    if (event != null && event.getAppointment() != null) {
+                        updateAppointmentStatusUseCase.execute(event);
+                    } else {
+                        logger.error("Dados inválidos para APPOINTMENT_CANCELLED. Mensagem: {}", messageBody);
+                        throw new AmqpRejectAndDontRequeueException("Dados inválidos para APPOINTMENT_CANCELLED");
+                    }
                 }
                 default -> {
                     logger.warn("Evento ignorado e removido da fila: {}. Mensagem: {}", eventType, messageBody);
@@ -75,10 +101,8 @@ public class AppointmentMessageConsumer {
             logger.info("Evento processado com sucesso: {} - appointment: {}", eventType, appointmentId);
 
         } catch (Exception e) {
-            logger.error("Erro processando mensagem: {}. Mensagem original: {}", e.getMessage(), messageBody);
-
-            // Para qualquer exceção, rejeita e não faz requeue
-            throw new AmqpRejectAndDontRequeueException("Failed to process message: " + e.getMessage(), e);
+            logger.error("Erro processando mensagem: {}. Mensagem original: {}", e.getMessage(), messageBody, e);
+            throw new AmqpRejectAndDontRequeueException("Failed to process message: " + e.getMessage());
         }
     }
 }

@@ -8,8 +8,8 @@ public class HistoryEventDTO {
     private String eventId;
     private String eventType;
     private LocalDateTime timestamp;
-    private Long appointmentId;
     private Map<String, Object> appointment;
+    private Long appointmentId;
     private Map<String, Object> clinicalData;
     private Long updatedBy;
 
@@ -17,12 +17,12 @@ public class HistoryEventDTO {
 
     // Construtor para APPOINTMENT_CREATED, APPOINTMENT_COMPLETED, APPOINTMENT_CANCELLED
     public HistoryEventDTO(String eventId, String eventType, LocalDateTime timestamp,
-                           Long appointmentId, Map<String, Object> appointment) {
+                            Map<String, Object> appointment, Long appointmentId) {
         this.eventId = eventId;
         this.eventType = eventType;
         this.timestamp = timestamp;
-        this.appointmentId = appointmentId;
         this.appointment = appointment;
+        this.appointmentId = appointmentId;
     }
 
     // Construtor específico para MEDICAL_DATA_ADDED

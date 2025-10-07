@@ -37,8 +37,12 @@ public class RabbitMQConfig {
     @Bean
     public MessageConverter jsonMessageConverter() {
         ObjectMapper objectMapper = new ObjectMapper();
-        // Permite comentários no JSON
+
+        // Configurações básicas para ser tolerante com desserialização
         objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+        objectMapper.configure(JsonParser.Feature.IGNORE_UNDEFINED, true);
+
+        // Para versões antigas, use o construtor diretamente
         return new Jackson2JsonMessageConverter(objectMapper);
     }
 

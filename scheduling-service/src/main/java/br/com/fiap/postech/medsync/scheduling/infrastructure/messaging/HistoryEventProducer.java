@@ -27,8 +27,8 @@ public class HistoryEventProducer {
                 UUID.randomUUID().toString(),
                 "APPOINTMENT_CREATED",
                 LocalDateTime.now(),
-                appointment.getId(),
-                appointmentDetail
+                appointmentDetail,
+                appointment.getId()
         );
 
         rabbitTemplate.convertAndSend(
@@ -48,8 +48,8 @@ public class HistoryEventProducer {
                 UUID.randomUUID().toString(),
                 "APPOINTMENT_COMPLETED",
                 LocalDateTime.now(),
-                appointment.getId(),
-                appointmentUpdate
+                appointmentUpdate,
+                appointment.getId()
         );
 
         rabbitTemplate.convertAndSend(
@@ -70,8 +70,8 @@ public class HistoryEventProducer {
                 UUID.randomUUID().toString(),
                 "APPOINTMENT_CANCELLED",
                 LocalDateTime.now(),
-                appointment.getId(),
-                appointmentUpdate
+                appointmentUpdate,
+                appointment.getId()
         );
 
         rabbitTemplate.convertAndSend(
