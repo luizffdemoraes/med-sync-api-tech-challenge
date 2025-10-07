@@ -39,11 +39,15 @@ import org.springframework.security.oauth2.server.authorization.settings.TokenSe
 import org.springframework.security.oauth2.server.authorization.token.*;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.io.InputStream;
+import java.security.KeyFactory;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -59,23 +63,27 @@ public class AuthorizationServerConfig {
     @Value("${security.jwt.duration}")
     private Integer jwtDurationSeconds;
 
+    private static final String STATIC_KID = "medsync-static-key";
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
-    public AuthorizationServerConfig(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder, UserRepository userRepository) {
+    public AuthorizationServerConfig(UserDetailsService userDetailsService,
+                                     PasswordEncoder passwordEncoder,
+                                     UserRepository userRepository) {
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
     }
 
-
+    // ============================================================
+    // 🔒 1. Security Filter Chain com suporte ao grant customizado
+    // ============================================================
     @Bean
     @Order(2)
     public SecurityFilterChain asSecurityFilterChain(HttpSecurity http) throws Exception {
         OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
 
-        // Custom grant configuration
         authorizationServerConfigurer
                 .tokenEndpoint(tokenEndpoint -> tokenEndpoint
                         .accessTokenRequestConverter(new CustomPasswordAuthenticationConverter())
@@ -83,24 +91,24 @@ public class AuthorizationServerConfig {
 
         var endpointsMatcher = authorizationServerConfigurer.getEndpointsMatcher();
 
-        // Aplica a configuração principal
         http
                 .securityMatcher(endpointsMatcher)
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
                 .csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
-                .with(authorizationServerConfigurer, configurer -> {
-                }); // ✅ aqui substitui o `.apply(...)`
+                .with(authorizationServerConfigurer, configurer -> {});
 
-        // Registra provider para o grant personalizado
         http.authenticationProvider(
                 new CustomPasswordAuthenticationProvider(
-                        authorizationService(), tokenGenerator(), userDetailsService, this.passwordEncoder, this.userRepository)
+                        authorizationService(), tokenGenerator(jwkSource(rsaKeyPair())), userDetailsService, this.passwordEncoder, this.userRepository)
         );
 
         return http.build();
     }
 
+    // ============================================================
+    // 🧩 2. Configurações auxiliares (clients, tokens, etc)
+    // ============================================================
     @Bean
     public OAuth2AuthorizationService authorizationService() {
         return new InMemoryOAuth2AuthorizationService();
@@ -113,7 +121,6 @@ public class AuthorizationServerConfig {
 
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
-        // @formatter:off
         RegisteredClient registeredClient = RegisteredClient
                 .withId(UUID.randomUUID().toString())
                 .clientId(clientId)
@@ -124,19 +131,16 @@ public class AuthorizationServerConfig {
                 .tokenSettings(tokenSettings())
                 .clientSettings(clientSettings())
                 .build();
-        // @formatter:on
 
         return new InMemoryRegisteredClientRepository(registeredClient);
     }
 
     @Bean
     public TokenSettings tokenSettings() {
-        // @formatter:off
         return TokenSettings.builder()
                 .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
                 .accessTokenTimeToLive(Duration.ofSeconds(jwtDurationSeconds))
                 .build();
-        // @formatter:on
     }
 
     @Bean
@@ -146,12 +150,70 @@ public class AuthorizationServerConfig {
 
     @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
-        return AuthorizationServerSettings.builder().build();
+        // define o issuer para consistência nos JWTs
+        return AuthorizationServerSettings.builder()
+                .issuer("http://localhost:8079") // ajuste conforme ambiente (Docker, dev, etc.)
+                .build();
+    }
+
+    // ============================================================
+    // 🔑 3. Chave RSA fixa carregada de arquivos PEM
+    // ============================================================
+    @Bean
+    public KeyPair rsaKeyPair() throws Exception {
+        String privateKeyPEM;
+        String publicKeyPEM;
+
+        try (InputStream privateStream = getClass().getClassLoader().getResourceAsStream("rsa/private-key.pem");
+             InputStream publicStream = getClass().getClassLoader().getResourceAsStream("rsa/public-key.pem")) {
+
+            if (privateStream == null || publicStream == null) {
+                throw new IllegalStateException("RSA keys not found in classpath (rsa/private-key.pem, rsa/public-key.pem)");
+            }
+
+            privateKeyPEM = new String(privateStream.readAllBytes())
+                    .replaceAll("-----BEGIN (.*)-----", "")
+                    .replaceAll("-----END (.*)-----", "")
+                    .replaceAll("\\s", "");
+
+            publicKeyPEM = new String(publicStream.readAllBytes())
+                    .replaceAll("-----BEGIN (.*)-----", "")
+                    .replaceAll("-----END (.*)-----", "")
+                    .replaceAll("\\s", "");
+        }
+
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        RSAPrivateKey privateKey = (RSAPrivateKey) keyFactory.generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyPEM)));
+        RSAPublicKey publicKey = (RSAPublicKey) keyFactory.generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyPEM)));
+
+        return new KeyPair(publicKey, privateKey);
     }
 
     @Bean
-    public OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator() {
-        NimbusJwtEncoder jwtEncoder = new NimbusJwtEncoder(jwkSource());
+    public JWKSource<SecurityContext> jwkSource(KeyPair rsaKeyPair) {
+        RSAPublicKey publicKey = (RSAPublicKey) rsaKeyPair.getPublic();
+        RSAPrivateKey privateKey = (RSAPrivateKey) rsaKeyPair.getPrivate();
+
+        RSAKey rsaKey = new RSAKey.Builder(publicKey)
+                .privateKey(privateKey)
+                .keyID(STATIC_KID)
+                .build();
+
+        JWKSet jwkSet = new JWKSet(rsaKey);
+        return (jwkSelector, context) -> jwkSelector.select(jwkSet);
+    }
+
+    // ============================================================
+    // 🔏 4. Encoder / Decoder / Token Customizer
+    // ============================================================
+    @Bean
+    public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
+        return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
+    }
+
+    @Bean
+    public OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator(JWKSource<SecurityContext> jwkSource) {
+        NimbusJwtEncoder jwtEncoder = new NimbusJwtEncoder(jwkSource);
         JwtGenerator jwtGenerator = new JwtGenerator(jwtEncoder);
         jwtGenerator.setJwtCustomizer(tokenCustomizer());
         OAuth2AccessTokenGenerator accessTokenGenerator = new OAuth2AccessTokenGenerator();
@@ -163,46 +225,16 @@ public class AuthorizationServerConfig {
         return context -> {
             OAuth2ClientAuthenticationToken principal = context.getPrincipal();
             CustomUserAuthorities user = (CustomUserAuthorities) principal.getDetails();
-            List<String> authorities = user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
-            if (context.getTokenType().getValue().equals("access_token")) {
-                // @formatter:off
+            List<String> authorities = user.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .toList();
+
+            if ("access_token".equals(context.getTokenType().getValue())) {
                 context.getClaims()
                         .claim("authorities", authorities)
                         .claim("username", user.getUsername())
-                        .claim("user_id", user.getUserId());;
-                // @formatter:on
+                        .claim("user_id", user.getUserId());
             }
         };
-    }
-
-    @Bean
-    public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
-        return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
-    }
-
-    @Bean
-    public JWKSource<SecurityContext> jwkSource() {
-        RSAKey rsaKey = generateRsa();
-        JWKSet jwkSet = new JWKSet(rsaKey);
-        return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
-    }
-
-    private static RSAKey generateRsa() {
-        KeyPair keyPair = generateRsaKey();
-        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-        return new RSAKey.Builder(publicKey).privateKey(privateKey).keyID(UUID.randomUUID().toString()).build();
-    }
-
-    private static KeyPair generateRsaKey() {
-        KeyPair keyPair;
-        try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(2048);
-            keyPair = keyPairGenerator.generateKeyPair();
-        } catch (Exception ex) {
-            throw new IllegalStateException(ex);
-        }
-        return keyPair;
     }
 }

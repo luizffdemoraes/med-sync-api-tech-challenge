@@ -84,16 +84,11 @@ services:
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: admin
       SPRING_RABBITMQ_PASSWORD: password
-      # CONFIGURAÇÕES OAuth2 CORRIGIDAS
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://auth-service:8079
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://auth-service:8079/oauth2/jwks
     depends_on:
       postgres:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-      auth-service:  # ADICIONAR DEPENDÊNCIA
-        condition: service_started
     networks:
       - medsync-network
     restart: unless-stopped
@@ -118,16 +113,11 @@ services:
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: admin
       SPRING_RABBITMQ_PASSWORD: password
-      # CONFIGURAÇÕES OAuth2 CORRIGIDAS
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://auth-service:8079
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://auth-service:8079/oauth2/jwks
     depends_on:
       postgres:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-      auth-service:  # ADICIONAR DEPENDÊNCIA
-        condition: service_started
     networks:
       - medsync-network
     restart: unless-stopped
@@ -152,9 +142,6 @@ services:
       SPRING_RABBITMQ_PASSWORD: password
       APP_RABBITMQ_QUEUE: notification-queue
       MAILTRAP_API_TOKEN: ${MAILTRAP_API_TOKEN:-}
-      # SE O NOTIFICATION-SERVICE PRECISAR DE AUTENTICAÇÃO, ADICIONE:
-      # SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://auth-service:8079
-      # SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://auth-service:8079/oauth2/jwks
     depends_on:
       postgres:
         condition: service_healthy
