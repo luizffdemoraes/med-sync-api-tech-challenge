@@ -63,7 +63,6 @@ public class AuthorizationServerConfig {
     @Value("${security.jwt.duration}")
     private Integer jwtDurationSeconds;
 
-    private static final String STATIC_KID = "medsync-static-key";
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
@@ -150,9 +149,8 @@ public class AuthorizationServerConfig {
 
     @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
-        // define o issuer para consistência nos JWTs
         return AuthorizationServerSettings.builder()
-                .issuer("http://localhost:8079") // ajuste conforme ambiente (Docker, dev, etc.)
+                .issuer("http://localhost:8079")
                 .build();
     }
 
@@ -190,16 +188,20 @@ public class AuthorizationServerConfig {
     }
 
     @Bean
-    public JWKSource<SecurityContext> jwkSource(KeyPair rsaKeyPair) {
+    public JWKSet jwkSet(KeyPair rsaKeyPair) {
         RSAPublicKey publicKey = (RSAPublicKey) rsaKeyPair.getPublic();
         RSAPrivateKey privateKey = (RSAPrivateKey) rsaKeyPair.getPrivate();
 
         RSAKey rsaKey = new RSAKey.Builder(publicKey)
                 .privateKey(privateKey)
-                .keyID(STATIC_KID)
                 .build();
 
-        JWKSet jwkSet = new JWKSet(rsaKey);
+        return new JWKSet(rsaKey);
+    }
+
+    @Bean
+    public JWKSource<SecurityContext> jwkSource(KeyPair rsaKeyPair) {
+        JWKSet jwkSet = jwkSet(rsaKeyPair);
         return (jwkSelector, context) -> jwkSelector.select(jwkSet);
     }
 

@@ -60,6 +60,6 @@ public class SecurityConfig {
     @Bean
     public JwtDecoder jwtDecoder() {
         // Ajuste o issuer/jwks conforme o Authorization Server
-        return NimbusJwtDecoder.withJwkSetUri("http://localhost:8079/oauth2/jwks").build();
+        return NimbusJwtDecoder.withJwkSetUri("http://medsync-auth:8079/oauth2/jwks").build();
     }
 }
