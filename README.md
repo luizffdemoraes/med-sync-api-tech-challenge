@@ -534,6 +534,17 @@ history-service/
    ```bash
    ./start.sh
    ```
+Ou, se preferir executar manualmente:
+
+   ```bash
+   docker compose up
+   ```
+
+Para parar e remover os containers e volumes, utilize:
+    
+    docker rm -f medsync-postgres
+    docker rm -f medsync-rabbitmq
+    docker compose down -v
 
 3. **Acesse os serviços:**
 

@@ -1,0 +1,689 @@
+{
+	"info": {
+		"_postman_id": "a40e1098-6b68-4a0b-ae16-a72f6d87eb33",
+		"name": "Medical Sync - FIAP",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12426144"
+	},
+	"item": [
+		{
+			"name": "2 - Scheduling Service",
+			"item": [
+				{
+					"name": "Appointament",
+					"item": [
+						{
+							"name": "3º Criar Consulta",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Cookie",
+										"value": "JSESSIONID=EA2C157C3737FACF297347A232213765"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"patientUserId\": 1,\n  \"patientEmail\": \"lffm1994@gmail.com\",\n  \"doctorUserId\": 2,\n  \"appointmentDate\": \"2025-10-10T14:30:00\",\n  \"type\": \"CONSULTATION\",\n  \"durationMinutes\": 30,\n  \"notes\": \"First routine appointment\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/appointments",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"appointments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Buscar Consulta por ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/appointments/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"appointments",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Listar Consultas com Filtros",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/appointments?patientId=101&doctorId=201&status=SCHEDULED&page=0&size=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"appointments"
+									],
+									"query": [
+										{
+											"key": "patientId",
+											"value": "101"
+										},
+										{
+											"key": "doctorId",
+											"value": "201"
+										},
+										{
+											"key": "status",
+											"value": "SCHEDULED"
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Adicionar Dados Médicos",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"chiefComplaint\": \"Pressão alta e dor de cabeça frequente\",\r\n  \"diagnosis\": \"Hipertensão arterial estágio 1\",\r\n  \"prescription\": \"Captopril 25mg - 1 comprimido 2x ao dia por 30 dias\",\r\n  \"clinicalNotes\": \"Paciente orientado sobre redução de sal e atividade física\",\r\n  \"updatedBy\": 201\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/appointments/1/medical-data",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"appointments",
+										"1",
+										"medical-data"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Completar Consulta",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"id\": 1,\r\n  \"status\": \"COMPLETED\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/appointments/1/complete?updatedBy=201",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"appointments",
+										"1",
+										"complete"
+									],
+									"query": [
+										{
+											"key": "updatedBy",
+											"value": "201"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Cancelar Consulta",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"cancellationReason\": \"Paciente adoeceu\",\r\n  \"updatedBy\": 201\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/appointments/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"appointments",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"description": "StartFragment\n\n### **Cenário 1: Fluxo Completo de Consulta**\n\n1. ✅ POST /appointments (Criar)\n    \n2. ✅ GET /appointments/{id} (Verificar)\n    \n3. ✅ PATCH /appointments/{id}/medical-data (Dados médicos)\n    \n4. ✅ PATCH /appointments/{id}/complete (Completar)\n    \n5. ✅ Verificar filas RabbitMQ\n    \n\n### **Cenário 2: Cancelamento**\n\n1. ✅ POST /appointments (Criar nova)\n    \n2. ✅ DELETE /appointments/{id} (Cancelar)\n    \n3. ✅ Verificar status CANCELLED\n    \n4. ✅ Verificar evento de cancelamento\n    \n\n### **Cenário 3: Listagem com Filtros**\n\n1. ✅ GET /appointments?patientId=101\n    \n2. ✅ GET /appointments?doctorId=201\n    \n3. ✅ GET /appointments?status=SCHEDULED\n    \n4. ✅ GET /appointments?patientId=101&doctorId=201\n    \n\nEndFragment"
+		},
+		{
+			"name": "1 - Auth Service",
+			"item": [
+				{
+					"name": "Login",
+					"item": [
+						{
+							"name": "2º - Login Pacient",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Armazena o access_token como variável de ambiente\r",
+											"pm.environment.set(\"access_token\", pm.response.json().access_token);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "username",
+											"value": "myclientid",
+											"type": "string"
+										},
+										{
+											"key": "password",
+											"value": "myclientsecret",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "grant_type",
+											"value": "password",
+											"type": "text"
+										},
+										{
+											"key": "username",
+											"value": "lffm1994@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "password123",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8079/oauth2/token",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8079",
+									"path": [
+										"oauth2",
+										"token"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "2º - Login Doctor",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Armazena o access_token como variável de ambiente\r",
+											"pm.environment.set(\"access_token\", pm.response.json().access_token);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "username",
+											"value": "myclientid",
+											"type": "string"
+										},
+										{
+											"key": "password",
+											"value": "myclientsecret",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "grant_type",
+											"value": "password",
+											"type": "text"
+										},
+										{
+											"key": "username",
+											"value": "carlos.silva@medsync.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "med123secure",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8079/oauth2/token",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8079",
+									"path": [
+										"oauth2",
+										"token"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "2º - Login Enfermeira",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Armazena o access_token como variável de ambiente\r",
+											"pm.environment.set(\"access_token\", pm.response.json().access_token);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "username",
+											"value": "myclientid",
+											"type": "string"
+										},
+										{
+											"key": "password",
+											"value": "myclientsecret",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "grant_type",
+											"value": "password",
+											"type": "text"
+										},
+										{
+											"key": "username",
+											"value": "maria.santos@medsync.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "nurse456care",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8079/oauth2/token",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8079",
+									"path": [
+										"oauth2",
+										"token"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "```\n- POST /oauth2/token**: Valida o login de um usuário.\n\n ```"
+				},
+				{
+					"name": "User",
+					"item": [
+						{
+							"name": "1.0 - Criar Novo Usuário Paciente",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Luiz Moraes\",\n    \"email\": \"lffm1994@gmail.com\",\n    \"login\": \"lffm1994\",\n    \"password\": \"password123\",\n    \"role\": \"ROLE_PATIENT\",\n    \"address\": {\n        \"street\": \"Rua das Flores\",\n        \"number\": 123,\n        \"city\": \"São Paulo\",\n        \"state\": \"SP\",\n        \"zipCode\": \"12345-678\"\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8079/v1/users",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8079",
+									"path": [
+										"v1",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "1.1 - Criar Novo Usuário Doutor",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Dr. Carlos Silva\",\n    \"email\": \"carlos.silva@medsync.com\",\n    \"login\": \"drcarlossilva\",\n    \"password\": \"med123secure\",\n    \"role\": \"ROLE_DOCTOR\",\n    \"address\": {\n        \"street\": \"Avenida Paulista\",\n        \"number\": 1500,\n        \"city\": \"São Paulo\",\n        \"state\": \"SP\",\n        \"zipCode\": \"01310-100\"\n    }\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8079/v1/users",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8079",
+									"path": [
+										"v1",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "1.2 - Criar Novo Usuário Enfermeira",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Enf. Maria Santos\",\n    \"email\": \"maria.santos@medsync.com\",\n    \"login\": \"enfmariasantos\",\n    \"password\": \"nurse456care\",\n    \"role\": \"ROLE_NURSE\",\n    \"address\": {\n        \"street\": \"Rua Augusta\",\n        \"number\": 750,\n        \"city\": \"São Paulo\",\n        \"state\": \"SP\",\n        \"zipCode\": \"01305-000\"\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8079/v1/users",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8079",
+									"path": [
+										"v1",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Consultar por ID do Usuário",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8079/v1/users/3",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8079",
+									"path": [
+										"v1",
+										"users",
+										"3"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Atualiza dados do Usuário por ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Enf. Maria Santos Pereira\",\r\n    \"email\": \"maria.pereira@medsync.com\",\r\n    \"login\": \"enfmariasantos\",\r\n    \"password\": \"nurse456care\",\r\n    \"role\": \"ROLE_NURSE\",\r\n    \"address\": {\r\n        \"street\": \"Rua Augusta\",\r\n        \"number\": 850,\r\n        \"city\": \"São Paulo\",\r\n        \"state\": \"SP\",\r\n        \"zipCode\": \"01305-001\"\r\n    }\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8079/v1/users/3",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8079",
+									"path": [
+										"v1",
+										"users",
+										"3"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Atualiza senha do Usuário por ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJraWQiOiI3MDI4M2MzNS0yOGFhLTQyOGUtODIwZS1mM2Q5YjVkNTE4YzciLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJteWNsaWVudGlkIiwiYXVkIjoibXljbGllbnRpZCIsIm5iZiI6MTc0ODMxNzUxMiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwIiwiZXhwIjoxNzQ4NDAzOTEyLCJpYXQiOjE3NDgzMTc1MTIsImp0aSI6ImEyMDAzZWVlLTIxZWItNGYzZC05N2ZmLTgxMzM4YTE1OTYxZCIsImF1dGhvcml0aWVzIjpbIlJPTEVfQ0xJRU5UIl0sInVzZXJuYW1lIjoiam9obmRvZUBleGFtcGxlLmNvbSJ9.KZUz98Bsb1ApHp3llstrQQQ01dZjIbwmQs-2meIJIZQCEC_zN0qa168iPibl1Lx91JLMNtY4a998tvzpP_kYi3KTpe1thhSMpFGKxmFFQayIdCsBF4SOrCHupbt0U5GPS3myJSgq6kokHZ0P29KXxgEi9rRqL4w89wYhgyLFAs6ws-gleYDxzQpxUbnjHL0AO5hGRrOfhTLI7uiTVN94Q3Qe1x_XLdBSknrKg6afGp0zD3dqTsqQdtWSPivrwu7wOmdb0Oc2tT30aijAoYcXo9P5Hp3nMijaXEnmYwY5rFiKyb6-lgZHc1B2Dto4YdmbDLWQuigAvbpjNwqFQHOU1g"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"password\": \"password123\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8079/v1/users/3/password",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8079",
+									"path": [
+										"v1",
+										"users",
+										"3",
+										"password"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "```\n- POST   /v1/users: Cria um novo usuário.\n- GET    /v1/users/{id}: Busca usuário por ID.\n- PUT    /v1/users/{id}: Atualiza as informações de um usuário.\n- PATCH  /v1/users/{id}/senha: Troca a senha de um usuário.\n- DELETE /v1/users/{id}: Exclui um usuário (apenas para admin).\n\n ```"
+				}
+			]
+		}
+	]
+}
