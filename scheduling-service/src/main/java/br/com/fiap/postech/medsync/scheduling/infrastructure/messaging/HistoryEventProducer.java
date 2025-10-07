@@ -21,11 +21,14 @@ public class HistoryEventProducer {
     }
 
     public void publishAppointmentCreated(AppointmentDTO appointment) {
-        HistoryEventDTO event = createHistoryEvent(
+        Map<String, Object> appointmentDetail = createAppointmentDetail(appointment);
+
+        HistoryEventDTO event = new HistoryEventDTO(
+                UUID.randomUUID().toString(),
                 "APPOINTMENT_CREATED",
+                LocalDateTime.now(),
                 appointment.getId(),
-                createAppointmentDetail(appointment),
-                RabbitMQConfig.APPOINTMENT_CREATED_KEY
+                appointmentDetail
         );
 
         rabbitTemplate.convertAndSend(
@@ -41,11 +44,12 @@ public class HistoryEventProducer {
                 "status", "COMPLETED"
         );
 
-        HistoryEventDTO event = createHistoryEvent(
+        HistoryEventDTO event = new HistoryEventDTO(
+                UUID.randomUUID().toString(),
                 "APPOINTMENT_COMPLETED",
+                LocalDateTime.now(),
                 appointment.getId(),
-                appointmentUpdate,
-                RabbitMQConfig.APPOINTMENT_COMPLETED_KEY
+                appointmentUpdate
         );
 
         rabbitTemplate.convertAndSend(
@@ -62,11 +66,12 @@ public class HistoryEventProducer {
                 "cancellationReason", reason
         );
 
-        HistoryEventDTO event = createHistoryEvent(
+        HistoryEventDTO event = new HistoryEventDTO(
+                UUID.randomUUID().toString(),
                 "APPOINTMENT_CANCELLED",
+                LocalDateTime.now(),
                 appointment.getId(),
-                appointmentUpdate,
-                RabbitMQConfig.APPOINTMENT_CANCELLED_KEY
+                appointmentUpdate
         );
 
         rabbitTemplate.convertAndSend(
@@ -76,37 +81,27 @@ public class HistoryEventProducer {
         );
     }
 
-    public void publishMedicalDataAdded(Long appointmentId, MedicalDataRequestDTO appointment) {
+    public void publishMedicalDataAdded(Long appointmentId, MedicalDataRequestDTO medicalData) {
         Map<String, Object> clinicalData = Map.of(
-                "chiefComplaint", appointment.getChiefComplaint(),
-                "diagnosis", appointment.getDiagnosis(),
-                "prescription", appointment.getPrescription(),
-                "notes", appointment.getClinicalNotes(),
-                "updatedBy", appointment.getUpdatedBy()
+                "chiefComplaint", medicalData.getChiefComplaint(),
+                "diagnosis", medicalData.getDiagnosis(),
+                "prescription", medicalData.getPrescription(),
+                "notes", medicalData.getClinicalNotes()
         );
 
-        HistoryEventDTO event = createHistoryEvent(
+        HistoryEventDTO event = new HistoryEventDTO(
+                UUID.randomUUID().toString(),
                 "MEDICAL_DATA_ADDED",
+                LocalDateTime.now(),
                 appointmentId,
                 clinicalData,
-                RabbitMQConfig.MEDICAL_DATA_ADDED_KEY
+                medicalData.getUpdatedBy()
         );
 
         rabbitTemplate.convertAndSend(
                 RabbitMQConfig.HISTORY_EXCHANGE,
                 RabbitMQConfig.MEDICAL_DATA_ADDED_KEY,
                 event
-        );
-    }
-
-    private HistoryEventDTO createHistoryEvent(String eventType, Long appointmentId,
-                                               Object data, String routingKey) {
-        return new HistoryEventDTO(
-                UUID.randomUUID().toString(),
-                eventType,
-                LocalDateTime.now(),
-                appointmentId,
-                data
         );
     }
 
