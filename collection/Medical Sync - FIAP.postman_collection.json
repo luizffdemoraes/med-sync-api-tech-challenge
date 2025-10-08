@@ -62,6 +62,16 @@
 						{
 							"name": "Buscar Consulta por ID",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "GET",
 								"header": [],
 								"url": {
@@ -82,10 +92,20 @@
 						{
 							"name": "Listar Consultas com Filtros",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/appointments?patientId=101&doctorId=201&status=SCHEDULED&page=0&size=10",
+									"raw": "http://localhost:8080/appointments?patientId=1&doctorId=2&status=SCHEDULED&page=0&size=10",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -97,11 +117,11 @@
 									"query": [
 										{
 											"key": "patientId",
-											"value": "101"
+											"value": "1"
 										},
 										{
 											"key": "doctorId",
-											"value": "201"
+											"value": "2"
 										},
 										{
 											"key": "status",
@@ -123,6 +143,16 @@
 						{
 							"name": "Adicionar Dados Médicos",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "PATCH",
 								"header": [],
 								"body": {
@@ -153,6 +183,16 @@
 						{
 							"name": "Completar Consulta",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "PATCH",
 								"header": [],
 								"body": {
@@ -189,6 +229,16 @@
 						{
 							"name": "Cancelar Consulta",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "DELETE",
 								"header": [],
 								"body": {
