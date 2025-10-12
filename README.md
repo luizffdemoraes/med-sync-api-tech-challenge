@@ -60,6 +60,8 @@ O sistema contempla perfis distintos (**DOCTOR, NURSE, PATIENT**) com permissõe
 | `PATCH /appointments/{id}/medical-data` | Adiciona dados médicos à consulta (ex.: prescrições, observações)                                | DOCTOR       |
 | `Posta mensagens em filas`              | Envia eventos para histórico e notificação (`HistoryEventProducer`, `NotificationEventProducer`) | Interno      |
 
+Obs: Na collection, há um exemplo de requisição para o agendamento de consulta utilizando o e-mail associado ao meu usuário. Caso deseje receber o e-mail de notificação, configure previamente a conta no Mailtrap e atualize os dados de e-mail na collection conforme necessário.
+
 ---
 
 ### 📨 Notification Service
@@ -498,13 +500,21 @@ history-service/
 
 ## 📡 Diagrama de Arquitetura
 
-![Diagrama de Arquitetura](images/docker-network.png)
+![Diagrama de Arquitetura](images/diagrama-arquitetura-aplicação.png)
 
 ---
 
 ## 🗄️ Diagrama das tabelas de banco de dados
 
 ![Diagrama de banco de dados](images/diagrama-db.png)
+
+---
+
+## 🔄 Diagrama de Fluxo
+
+![Diagrama de Fluxo](images/diagrama-fluxo.png)
+
+---
 
 > O script [`01-init.sql`](db/01-init.sql) define schemas **scheduling** e **history**, incluindo entidades de usuários, pacientes, médicos, consultas e histórico clínico.
 
